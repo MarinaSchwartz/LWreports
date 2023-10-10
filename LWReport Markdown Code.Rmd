@@ -1,0 +1,67 @@
+```{r}
+tinytex::tlmgr_update()
+```
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+title: "Practice Document"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Florida LAKEWATCH Report for «Lake» in «County» County Using Data Downloaded 12/9/2022
+
+### Introduction for Lakes
+
+This report summarizes data collected on systems that have been part of the LAKEWATCH program. Data are from the period of record for individual systems. Part one allows the comparison of data with Florida Department of Environmental Protection's Numeric Nutrient Criteria. Part two allows a comparison of the long-term mean nutrient concentrations with nutrient zone concentrations published by LAKEWATCH staff (Bachmann et al. 2012; <https://lakewatch.ifas.ufl.edu/resources/bibliography/>). Finally, this report examines data for long-term trends that may be occurring in individual systems but only for systems with **five or more years of data**. Step by step instructions on how to use the data tables are provided on page 4 of this report.
+
+### Florida Department of Environmental Protection (FDEP) Nutrient Criteria for Lakes (Table 1)
+
+For lakes, the numeric interpretations of the nutrient criterion in paragraph 62-302.530(47)(b), F.A.C., based on chlorophyll are shown in Table 1. The applicable interpretations for TN and TP will vary on an annual basis, depending on the availability and concentration of chlorophyll data for the lake. The numeric interpretations for TN, TP, and chlorophyll shall not be exceeded more than once in any consecutive three year period.
+
+a.  If annual geometric mean chlorophyll does not exceed the chlorophyll value for one of three lake classification groups listed in the table below, then the TN and TP numeric interpretations for that calendar year shall be the annual geometric means of the maximum calculated numeric interpretation in Table 1.
+
+b.  If there are insufficient data to calculate the annual geometric mean chlorophyll for a given year or the annual geometric mean chlorophyll exceeds the values in Table 1 for the correct lake classification group, then the applicable numeric interpretations for TN and TP shall be the minimum values in Table 1.
+
+### Long-Term Data Summary for Lakes (Table 2): Definitions
+
+-   **Total Phosphorus (µg/L):** Nutrient most often limiting growth of plant/algae.
+-   **Total Nitrogen (µg/L):** Nutrient needed for aquatic plant/algae growth but only limiting when nitrogen to phosphorus ratios are generally less than 10 (by mass).
+-   **Chlorophyll-uncorrected (µg/L):** Chlorophyll concentrations are used to measure relative abundances of open water algae.
+-   **Secchi (ft), Secchi (m):** Secchi measurements are estimates of water clarity.
+-   **Color (Pt-Co Units):** LAKEWATCH measures true color, which is the color of the water after particles have been filtered out.
+-   **Specific Conductance (µS/cm \@ 25 C):** Measurement of the ability of water to conduct electricity and can be used to estimate the amount of dissolved materials in water.
+-   **Lake Classification:** Numeric nutrient criteria for Florida require that lakes must first be classified into one of three group based on color and alkalinity or specific conductance; **colored lakes** (color greater than 40 Pt-Co units), **clear soft water lakes** (color less than or equal to 40 Pt-Co units and alkalinity less than or equal to 20 mg/L as CaCO3 or specific conductance less than or equal to 100 µs/cm @25 C), and **clear hard water lakes** (color less than 40 Pt-Co units and alkalinity greater than 20 mg/L as CaCO3 or specific conductance greater 100 µS/cm \@ 25 C).
+
+### Table 1. Florida Department of Environmental Protection's Numeric Nutrient Criteria for lakes.
+
+![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.](CODING/Markdown/LW%20Reports%20Table%201%20V.2.png)
+
+For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
+
+### Table 2. Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria.
+
+ 
+You can embed an R code chunk here for the table will need to pull info from the Data Management system - Make the table with place holder info
+
+like this:
+
+```{r cars}
+summary(cars)
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
