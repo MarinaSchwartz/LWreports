@@ -1,14 +1,14 @@
 ```{r}
 tinytex::tlmgr_update()
 ```
+
 ---
 output:
   pdf_document: default
   html_document: default
 ---
-title: "Practice Document"
-output: pdf_document
----
+
+title: "Practice Document" output: pdf_document ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -46,22 +46,79 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 
 ### Table 2. Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria.
 
- 
-You can embed an R code chunk here for the table will need to pull info from the Data Management system - Make the table with place holder info
-
-like this:
-
-```{r cars}
-summary(cars)
+```{r include=FALSE}
+library(tidyverse)
+library(gt)
 ```
 
+```{r include=FALSE}
+data = read_csv("All_Data.csv")
 
-## Including Plots
+data_test = data %>% filter(Lake == "Alice")
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r include=FALSE}
+data_means = data_test %>% group_by(Lake) %>% summarise(
+  "Total Phosphorus (µg/L)" = mean(TP, na.rm = TRUE),
+  "Total Nitrogen (µg/L)" = mean(TN, na.rm = TRUE),
+  "Chlorophyll- uncorrected (µg/L)" = mean(CHL, na.rm = TRUE),
+  "Secchi (ft)" = mean(SECCHI_ft, na.rm = TRUE),
+  "Secchi (m)" = mean(SECCHI_ft, na.rm = TRUE)*0.3,
+  "Color (Pt-Co Units)" = mean(Color, na.rm = TRUE),
+  "Specific Conductance (µS/cm@25 C)" = mean(Cond_uS, na.rm = TRUE),
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean") %>% select(-Lake)
+
+
+
+data_mins = data_test %>% group_by(Lake) %>% summarise(
+  "Total Phosphorus (µg/L)" = min(TP, na.rm = TRUE),
+  "Total Nitrogen (µg/L)" = min(TN, na.rm = TRUE),
+  "Chlorophyll- uncorrected (µg/L)" = min(CHL, na.rm = TRUE),
+  "Secchi (ft)" = min(SECCHI_ft, na.rm = TRUE),
+  "Secchi (m)" = min(SECCHI_ft, na.rm = TRUE)*0.3,
+  "Color (Pt-Co Units)" = min(Color, na.rm = TRUE),
+  "Specific Conductance (µS/cm@25 C)" = min(Cond_uS, na.rm = TRUE),
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "min") %>% select(-Lake)
+
+data_max = data_test %>% group_by(Lake) %>% summarise(
+  "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
+  "Total Nitrogen (µg/L)" = max(TN, na.rm = TRUE),
+  "Chlorophyll- uncorrected (µg/L)" = max(CHL, na.rm = TRUE),
+  "Secchi (ft)" = max(SECCHI_ft, na.rm = TRUE),
+  "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
+  "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
+  "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") %>% select(-Lake)
+
+
+data_years = data_test %>% group_by(Lake) %>% summarise(
+  "Total Phosphorus (µg/L)" = sum(is.na(TP))
+
+ #this is not correct still, work in progress
+
+) #%>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") %>% select(-Lake)
+
+
+
+data_combined = full_join(data_mins,data_max, by = "parameter")
+data_combined = full_join(data_combined,data_means, by = "parameter")
+```
+
+```{r echo = FALSE}
+table_test <- gt(data = data_combined) %>% cols_label(
+  parameter = "Parameter",
+  min = "Minimum<br>Annual Geometric Means",
+  max = "Maximum<br>Annual Geometric Means",
+  mean = "Grand<br>Geometric Mean",
+  .fn = md
+) %>% fmt_number(
+  columns = c(min, max, mean),
+  decimals = 1
+) %>% tab_header(
+  title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))
+
+
+table_test
+
+```
