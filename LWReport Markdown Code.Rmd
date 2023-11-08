@@ -14,6 +14,32 @@ title: "Practice Document" output: pdf_document ---
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+###IMPORTING LIBRARIES AND LOADING DATA###
+
+#importing libraries 
+library(tidyverse)
+library(gt)
+library(SciViews)
+
+#loading data and filtering for Lake Alice
+path <- "C:/Users/amber.riner/Documents/LWreports"
+setwd(path)
+data = read_csv("All_Data.csv")
+lake = data %>% filter(Lake == "Alice") #subsetting data for lake alice
+
+
+###FUNCTIONS###
+
+#calculates geometric mean
+gmean <- function(x){
+  xc <- x[!is.na(x)]
+  xg <- exp(mean(log(xc[xc>0])))
+  xg <- round(xg)
+  return(xg)
+} 
+```
+
 ## Florida LAKEWATCH Report for «Lake» in «County» County Using Data Downloaded 12/9/2022
 
 ### Introduction for Lakes
@@ -40,25 +66,22 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 
 ### Table 1. Florida Department of Environmental Protection's Numeric Nutrient Criteria for lakes.
 
-![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.](CODING/Markdown/LW%20Reports%20Table%201%20V.2.png)
+![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
+
+```{r}
+knitr::include_graphics("LW Reports Table 1 V.2.png")
+```
+
+
 
 For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
 
 ### Table 2. Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria.
 
-```{r include=FALSE}
-library(tidyverse)
-library(gt)
-```
 
 ```{r include=FALSE}
-data = read_csv("All_Data.csv")
-
 data_test = data %>% filter(Lake == "Alice")
 
-```
-
-```{r include=FALSE}
 data_means = data_test %>% group_by(Lake) %>% summarise(
   "Total Phosphorus (µg/L)" = mean(TP, na.rm = TRUE),
   "Total Nitrogen (µg/L)" = mean(TN, na.rm = TRUE),
@@ -67,7 +90,7 @@ data_means = data_test %>% group_by(Lake) %>% summarise(
   "Secchi (m)" = mean(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = mean(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = mean(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean") %>% select(-Lake)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean") #%>% select(-Lake)
 
 
 
@@ -79,7 +102,7 @@ data_mins = data_test %>% group_by(Lake) %>% summarise(
   "Secchi (m)" = min(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = min(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = min(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "min") %>% select(-Lake)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "min")  #%>% select(-Lake)
 
 data_max = data_test %>% group_by(Lake) %>% summarise(
   "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
@@ -89,7 +112,8 @@ data_max = data_test %>% group_by(Lake) %>% summarise(
   "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") %>% select(-Lake)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") 
+#%>% select(-Lake)
 
 
 data_years = data_test %>% group_by(Lake) %>% summarise(
@@ -122,3 +146,71 @@ table_test <- gt(data = data_combined) %>% cols_label(
 table_test
 
 ```
+
+### Table 3. Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons. 
+
+```{r}
+### TABLE 3 CODE ###
+
+#geometric means by year
+byyr <- lake %>%
+  group_by(Year) %>%
+  summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft))
+
+#total geometric means means 
+ggtp <- gmean(byyr$`gmean(TP)`)
+ggtn <- gmean(byyr$`gmean(TN)`)
+ggchl <- gmean(byyr$`gmean(CHL)`) 
+ggsec <- gmean(byyr$`gmean(SECCHI_ft)`)
+
+#calculate TSI
+tsi_sd <- 60 -14.41*ln(ggsec)
+tsi_chl <- 9.81* ln(ggchl) + 30.6
+tsi_tp <- 14.42* ln(ggtp) + 4.15
+tsi <- mean(tsi_sd, tsi_chl, tsi_tp)
+
+
+#define variables
+cnty <- lake$County[1] #county
+name <- lake$Lake[1] #name
+pr <- paste(min(lake$Year), " to ", max(lake$Year)) #period of record
+lts <- ifelse(tsi < 40 , "Oligotrophic", 
+              (ifelse(tsi < 50 , "Mesotrophic",
+               (ifelse(tsi < 70, "Eutrophic", "Hypereutrophic")))))  #lake trophic status
+tpz <- ifelse(ggtp >= 355, "TP6", 
+              (ifelse(ggtp >= 252, "TP5",
+               (ifelse(ggtp >= 93, "TP4",
+                (ifelse(ggtp >= 45, "TP3",
+                 (ifelse(ggtp >= 21, "TP2","TP1"))))))))) #tp zone
+gtp <- paste(ggtp, "(", min(byyr$`gmean(TP)`), " to ", max(byyr$`gmean(TP)`) , ")" ) #grand tp geomean
+tnz <- ifelse(ggtn >= 2701, "TN6", 
+              (ifelse(ggtn >= 1369, "TN5",
+               (ifelse(ggtn >= 1087, "TN4",
+                (ifelse(ggtn >= 642, "TN3",
+                 (ifelse(ggtn >= 450, "TN2","TN1"))))))))) #tn zone
+gtn <- paste(ggtn, "(", min(byyr$`gmean(TN)`), " to ", max(byyr$`gmean(TN)`), ")") #gran tn geomean
+
+
+#no info in csv to get these values
+gnis <- "NA"
+lat <- "NA"
+long <- "NA"
+wbt <- "Lake"
+sa <- "NA"
+
+#add values to array
+rowval <- c(cnty, name, gnis, lat, long, wbt, sa, pr, lts, tpz, gtp, tnz, gtn )
+
+#add row names to array
+rowname <- c("County", "Name", "GNIS Number", "Latitude", "Longitude", "Water Body Type", "Surface Area (ha and acre)", "Period of Record (year)", "Lake Tophic Status (CHL)", "TP Zone", "Grand TP Geometric Mean Concentration (ug/ L, min, and max.)", "TN Zone", "Grand TN Geometric Mean Concentration (ug/ L, min, and max.)")
+
+#make dataframe with rownames and row values
+tbl3df <- data.frame(rowname, rowval)
+
+#make gt table
+gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE)
+
+
+
+```
+
