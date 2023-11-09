@@ -26,7 +26,7 @@ library(SciViews)
 path <- "C:/Users/amber.riner/Documents/LWreports"
 setwd(path)
 data = read_csv("All_Data.csv")
-lake = data %>% filter(Lake == "Alice") #subsetting data for lake alice
+lake = data %>% filter(County == "Alachua" & Lake == "Alice") #subsetting data for lake alice
 
 
 ###FUNCTIONS###
