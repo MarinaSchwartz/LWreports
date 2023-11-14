@@ -1,5 +1,5 @@
 ```{r}
-tinytex::tlmgr_update()
+#tinytex::tlmgr_update()
 ```
 
 ---
@@ -21,10 +21,15 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(gt)
 library(SciViews)
+library(broom)
+#broom is just to get values form lm function in easier to reference form
+library(glue)
+library(ggtext)
+#glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
 
 #loading data and filtering for Lake Alice
-path <- "C:/Users/amber.riner/Documents/LWreports"
-setwd(path)
+#path <- "C:/Users/amber.riner/Documents/LWreports"
+#setwd(path)
 data = read_csv("All_Data.csv")
 lake = data %>% filter(County == "Alachua" & Lake == "Alice") #subsetting data for lake alice
 
@@ -80,8 +85,13 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 
 
 ```{r include=FALSE}
-data_test = data %>% filter(Lake == "Alice")
+data_test = lake %>% filter(Lake == "Alice")
 
+#note: these tables work but it has two issues at the moment
+##one is that is is not using the geometric mean, just mean. 
+### it is using the min and max value, when we want the min and max mean value across ampling years
+#it is also missing the number of sampling years for each variable. i need to work on calculating that. so far i can't figure out how to do that. 
+#another issue, how does lakewatch handle bottom in thier reports?
 data_means = data_test %>% group_by(Lake) %>% summarise(
   "Total Phosphorus (µg/L)" = mean(TP, na.rm = TRUE),
   "Total Nitrogen (µg/L)" = mean(TN, na.rm = TRUE),
@@ -213,4 +223,48 @@ gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE)
 
 
 ```
+
+
+
+
+
+#graph example
+
+this is an example of the phosphorous graph, work in progress still
+
+
+
+```{r}
+
+#lm for graph to refer to 
+
+total_p_lm = lm(TP ~ Year, data = lake)
+
+total_p_table = glance(total_p_lm)
+
+label = (glue("R<sup>2</sup> = {round(total_p_table$r.squared, 2)}"))
+
+
+
+total_p_graph = ggplot(data = lake, aes(x = Year, y = TP)) +
+  geom_point() +
+  geom_smooth(
+    method = "lm", 
+    se = FALSE, 
+    linetype = paste(
+      if_else(total_p_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      )
+    ) +
+  labs(title = "Total Phosphorus (µg/L) by Year", x = "Year", y = "Total Phosphorus (µg/L)")+
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
+    label = label
+    ,x = (min(lake$Year)+5),
+    y = (max(lake$TP)+5),
+    )+ylim(min(lake$TP), max(lake$TP)+10)
+
+
+show(total_p_graph)
+```
+
 
