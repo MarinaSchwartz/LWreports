@@ -10,11 +10,11 @@ output:
 
 title: "Practice Document" output: pdf_document ---
 
-```{r setup, include=FALSE}
+```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r include=FALSE}
 ###IMPORTING LIBRARIES AND LOADING DATA###
 
 #importing libraries 
@@ -73,7 +73,7 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 
 ![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
 
-```{r}
+```{r include=FALSE}
 knitr::include_graphics("LW Reports Table 1 V.2.png")
 ```
 
