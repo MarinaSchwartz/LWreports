@@ -22,17 +22,29 @@ library(tidyverse)
 library(gt)
 library(SciViews)
 library(broom)
-#broom is just to get values form lm function in easier to reference form
+#broom is just to get values form lm function in easier to reference from
 library(glue)
 library(ggtext)
 #glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
+library(readxl)
 
 #loading data and filtering for Lake Alice
 #path <- "C:/Users/amber.riner/Documents/LWreports"
 #setwd(path)
-data = read_csv("All_Data.csv")
-lake = data %>% filter(County == "Alachua" & Lake == "Alice") #subsetting data for lake alice
 
+data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+
+
+data_1 <- data_1 %>%
+  mutate(Lake_County = paste(Lake, County))
+         
+data_2 = read_csv("All_Data.csv")
+
+data_2 = data_2 %>%
+  mutate(Lake_County = paste(Lake, County))
+
+lake_1 = data_1 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+lake_2 = data_2 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
 
 ###FUNCTIONS###
 
