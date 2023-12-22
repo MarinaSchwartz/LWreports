@@ -46,6 +46,23 @@ data_2 = data_2 %>%
 lake_1 = data_1 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
 lake_2 = data_2 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
 
+#adding a column using if/else for lake classification
+##this code currently has no fallback for if the data is missing.
+lake_2 = lake_2 %>% mutate(lake_class = ifelse(
+  gmean(`Color`) > 40, "Colored", ifelse(
+    gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+
+#adding a column using if/else for trophic state
+
+lake_2 = lake_2 %>% mutate(trophic_state = ifelse(
+  gmean(CHL) < 3, "Oligotrophic", ifelse(
+    gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+      gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypertrophic"))))
+
+### merge test
+#data_lw = data_1 %>% filter(Study == "LW") %>% filter(`water type` != "Lake")
+#merging data will be tricky because the data_1 is longer, not sure off hand how to merge the data into a master set. 
+
 ###FUNCTIONS###
 
 #calculates geometric mean
@@ -97,21 +114,22 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 
 
 ```{r include=FALSE}
-data_test = lake %>% filter(Lake == "Alice")
+
 
 #note: these tables work but it has two issues at the moment
 ##one is that is is not using the geometric mean, just mean. 
 ### it is using the min and max value, when we want the min and max mean value across ampling years
 #it is also missing the number of sampling years for each variable. i need to work on calculating that. so far i can't figure out how to do that. 
 #another issue, how does lakewatch handle bottom in thier reports?
-data_means = data_test %>% group_by(Lake) %>% summarise(
-  "Total Phosphorus (µg/L)" = mean(TP, na.rm = TRUE),
-  "Total Nitrogen (µg/L)" = mean(TN, na.rm = TRUE),
-  "Chlorophyll- uncorrected (µg/L)" = mean(CHL, na.rm = TRUE),
-  "Secchi (ft)" = mean(SECCHI_ft, na.rm = TRUE),
-  "Secchi (m)" = mean(SECCHI_ft, na.rm = TRUE)*0.3,
-  "Color (Pt-Co Units)" = mean(Color, na.rm = TRUE),
-  "Specific Conductance (µS/cm@25 C)" = mean(Cond_uS, na.rm = TRUE),
+data_means = lake_1 %>% group_by(Lake) %>% summarise(
+  "Total Phosphorus (µg/L)" = gmean(TP, na.rm = TRUE),
+  "Total Nitrogen (µg/L)" = gmean(TN, na.rm = TRUE),
+  "Chlorophyll- uncorrected (µg/L)" = gmean(CHL, na.rm = TRUE),
+  "Secchi (ft)" = gmean(SECCHI_ft, na.rm = TRUE),
+  "Secchi (m)" = gmean(SECCHI_ft, na.rm = TRUE)*0.3,
+  "Color (Pt-Co Units)" = gmean(Color, na.rm = TRUE),
+  "Specific Conductance (µS/cm@25 C)" = gmean(Cond_uS, na.rm = TRUE),
+  "Lake Classification" = 
 ) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean") #%>% select(-Lake)
 
 
@@ -152,11 +170,12 @@ data_combined = full_join(data_combined,data_means, by = "parameter")
 ```
 
 ```{r echo = FALSE}
-table_test <- gt(data = data_combined) %>% cols_label(
+table_one <- gt(data = data_combined) %>% cols_label(
   parameter = "Parameter",
   min = "Minimum<br>Annual Geometric Means",
   max = "Maximum<br>Annual Geometric Means",
   mean = "Grand<br>Geometric Mean",
+  
   .fn = md
 ) %>% fmt_number(
   columns = c(min, max, mean),
