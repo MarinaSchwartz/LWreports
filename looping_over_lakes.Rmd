@@ -1,0 +1,76 @@
+---
+title: "lakewatch lake for loop"
+output: pdf_document
+date: "2023-12-29"
+---
+
+```{r}
+#importing libraries 
+library(tidyverse)
+library(gt)
+library(SciViews)
+library(broom)
+#broom is just to get values form lm function in easier to reference from
+library(glue)
+library(ggtext)
+#glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
+library(readxl)
+
+lake = read_csv("for_loop_all_data.csv")
+
+#lake_2 = read_csv("lakewatch_lake_county_LW_lake only.csv")
+
+#calculates geometric mean
+gmean <- function(x){
+  xc <- x[!is.na(x)]
+  xg <- exp(mean(log(xc[xc>0])))
+  xg <- round(xg)
+  return(xg)
+} 
+
+#adding a column using if/else for lake classification
+##this code currently has no fallback for if the data is missing.
+lake = lake %>% mutate(lake_class = ifelse(
+  gmean(`Color`) > 40, "Colored", ifelse(
+    gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+
+#adding a column using if/else for trophic state
+
+lake = lake %>% mutate(trophic_state = ifelse(
+  gmean(CHL) < 3, "Oligotrophic", ifelse(
+    gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+      gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+
+
+#have to add this. this code tells rmarkdown to not try remove html tags, allows for use of html to format GT table objects.
+options(gt.html_tag_check = FALSE)
+
+
+```
+
+
+for loop
+
+```{r}
+
+
+
+  
+  purrr::walk(
+  .x = unique(lake$Lake_County),
+  ~ rmarkdown::render(
+    input = "LWReport Markdown Code.Rmd",
+    output_format = "pdf_document",
+    output_file = glue::glue("{.x}.pdf"),
+    params = list(Lake_County = {.x}),
+    output_dir = "output",
+  ),
+  .progress = TRUE
+)
+
+  
+    
+
+
+```
+

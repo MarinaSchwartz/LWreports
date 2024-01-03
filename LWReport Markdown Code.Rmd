@@ -1,22 +1,30 @@
-```{r}
-#tinytex::tlmgr_update()
-```
-
 ---
 output:
   pdf_document: default
   html_document: default
 ---
+```{r}
+#tinytex::tlmgr_update()
+```
 
-title: "Practice Document" output: pdf_document ---
+---
+title: "lakewatch lake template batch processing"
+output:
+  pdf_document: default
+  html_document: default
+params: 
+  lake: "lake county"
+---
+
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r include=FALSE}
+```{r data_processing,  eval=TRUE, include=FALSE}
 ###IMPORTING LIBRARIES AND LOADING DATA###
-
+##########################################################################################
+#Commenting out this code to add to the for loop file
 #importing libraries 
 library(tidyverse)
 library(gt)
@@ -32,22 +40,24 @@ library(readxl)
 #path <- "C:/Users/amber.riner/Documents/LWreports"
 #setwd(path)
 
+########################################################################################
+  ###commenting this code out so i can test the for loop.  
 
-         
+
 data_1 = read_csv("All_Data.csv")
 
 data_1 = data_1 %>%
   mutate(Lake_County = paste(Lake, County))
 
-data_2 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+#data_2 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
 
 
-data_2 <- data_2 %>%
-  mutate(Lake_County = paste(Lake, County))
+#data_2 <- data_2 %>%
+ # mutate(Lake_County = paste(Lake, County))
 
 lake = data_1 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
-lake_2 = data_2 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
-
+#lake_2 = data_2 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+##################################################################################
 
 
 
@@ -78,6 +88,8 @@ lake = lake %>% mutate(trophic_state = ifelse(
     gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
       gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
 
+#have to add this. this code tells rmarkdown to not try remove html tags, allows for use of html to format GT table objects.
+options(gt.html_tag_check = FALSE)
 
 ```
 
@@ -109,18 +121,18 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 
 ![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
 
-```{r include=FALSE}
+```{r table_one_image, include=TRUE}
 knitr::include_graphics("LW Reports Table 1 V.2.png")
+
 ```
 
 
 
 For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
 
-### Table 2. Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria.
 
 
-```{r include=FALSE}
+```{r table_2_data, include=FALSE}
 
 
 #note: these tables work but it has two issues at the moment
@@ -176,8 +188,8 @@ data_combined = full_join(data_mins,data_max, by = "parameter")
 data_combined = full_join(data_combined,data_means, by = "parameter")
 ```
 
-```{r echo = FALSE}
-table_one <- gt(data = data_combined) %>% cols_label(
+```{r table_2_gt, echo = FALSE}
+table_two <- gt(data = data_combined) %>% cols_label(
   parameter = "Parameter",
   min = "Minimum<br>Annual Geometric Means",
   max = "Maximum<br>Annual Geometric Means",
@@ -187,16 +199,23 @@ table_one <- gt(data = data_combined) %>% cols_label(
   columns = c(min, max, mean),
   decimals = 1
 ) %>% tab_header(
-  title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))
+  title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))  
 
+gtsave(table_two, filename = "table_2.png", path = "output/output_table")
 
-table_one
 
 ```
 
-### Table 3. Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons. 
 
 ```{r}
+knitr::include_graphics("output/output_table/table_2.png")
+```
+
+
+
+### Table 3. Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons. 
+
+```{r table_3, include=FALSE}
 ### TABLE 3 CODE ###
 
 #geometric means by year
@@ -271,7 +290,7 @@ this is an example of the phosphorous graph, work in progress still
 
 Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p < 0.05 is significant). Trend Status are reported on plots.
 
-```{r}
+```{r p_graph}
 
 #lm for graph to refer to 
 
@@ -312,7 +331,7 @@ show(total_p_graph)
 
 
 
-```{r}
+```{r n_graph}
 total_n_lm = lm(TN ~ Year, data = lake)
 
 total_n_table = glance(total_n_lm)
@@ -351,7 +370,7 @@ show(total_n_graph)
 Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p < 0.05 is significant). Trend status are reported on plots.
 
 
-```{r}
+```{r chl_graph}
 total_chl_lm = lm(CHL ~ Year, data = lake)
 
 total_chl_table = glance(total_chl_lm)
@@ -388,7 +407,7 @@ show(total_chl_graph)
 
 ```
 
-```{r}
+```{r secchi_graph}
 total_secchi_lm = lm(SECCHI_ft ~ Year, data = lake)
 
 total_secchi_table = glance(total_secchi_lm)
