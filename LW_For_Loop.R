@@ -24,7 +24,8 @@ head(data_2)
 
 data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
 
-Lakes = unique(data_all$Lake_County)
+#Lakes = unique(data_all$Lake_County)
+Lakes = "Alice Alachua"
 print(Lakes)
 
 n = 1
@@ -36,9 +37,15 @@ for(l in Lakes){
  #subsets data for lake of interest
  Lake <- data_all %>%
   filter(Lake_County == l) 
+  file_name = paste(Lake[1], ".pdf")
 
  ########################################################
   ###put code for knitting pdf from markdown code here###
+ 
+ rmarkdown::render("LWReport Markdown Code.Rmd", params = list(
+   file = filename
+ )) ###this section doesn't work right now, but the for loop works
+  
  ########################################################
  
  #counter
