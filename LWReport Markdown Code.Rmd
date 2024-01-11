@@ -1,22 +1,30 @@
-```{r}
-#tinytex::tlmgr_update()
-```
-
 ---
 output:
   pdf_document: default
   html_document: default
 ---
+```{r}
+#tinytex::tlmgr_update()
+```
 
-title: "Practice Document" output: pdf_document ---
+---
+title: "lakewatch lake template batch processing"
+output:
+  pdf_document: default
+  html_document: default
+params: 
+  lake: "lake county"
+---
+
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r include=FALSE}
+```{r data_processing,  eval=TRUE, include=FALSE}
 ###IMPORTING LIBRARIES AND LOADING DATA###
-
+##########################################################################################
+#Commenting out this code to add to the for loop file
 #importing libraries 
 library(tidyverse)
 library(gt)
@@ -32,19 +40,30 @@ library(readxl)
 #path <- "C:/Users/amber.riner/Documents/LWreports"
 #setwd(path)
 
-data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+########################################################################################
+  ###commenting this code out so i can test the for loop.  
 
 
-data_1 <- data_1 %>%
-  mutate(Lake_County = paste(Lake, County))
-         
-data_2 = read_csv("All_Data.csv")
+data_1 = read_csv("All_Data.csv")
 
-data_2 = data_2 %>%
+data_1 = data_1 %>%
   mutate(Lake_County = paste(Lake, County))
 
-lake_1 = data_1 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
-lake_2 = data_2 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+#data_2 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+
+
+#data_2 <- data_2 %>%
+ # mutate(Lake_County = paste(Lake, County))
+
+lake = data_1 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+#lake_2 = data_2 %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+##################################################################################
+
+
+
+### merge test
+#data_lw = data_1 %>% filter(Study == "LW") %>% filter(`water type` != "Lake")
+#merging data will be tricky because the data_1 is longer, not sure off hand how to merge the data into a master set. 
 
 ###FUNCTIONS###
 
@@ -55,6 +74,23 @@ gmean <- function(x){
   xg <- round(xg)
   return(xg)
 } 
+
+#adding a column using if/else for lake classification
+##this code currently has no fallback for if the data is missing.
+lake = lake %>% mutate(lake_class = ifelse(
+  gmean(`Color`) > 40, "Colored", ifelse(
+    gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+
+#adding a column using if/else for trophic state
+
+lake = lake %>% mutate(trophic_state = ifelse(
+  gmean(CHL) < 3, "Oligotrophic", ifelse(
+    gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+      gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+
+#have to add this. this code tells rmarkdown to not try remove html tags, allows for use of html to format GT table objects.
+options(gt.html_tag_check = FALSE)
+
 ```
 
 ## Florida LAKEWATCH Report for «Lake» in «County» County Using Data Downloaded 12/9/2022
@@ -85,38 +121,39 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 
 ![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
 
-```{r include=FALSE}
+```{r table_one_image, include=TRUE}
 knitr::include_graphics("LW Reports Table 1 V.2.png")
+
 ```
 
 
 
 For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
 
-### Table 2. Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria.
 
 
-```{r include=FALSE}
-data_test = lake %>% filter(Lake == "Alice")
+```{r table_2_data, include=FALSE}
+
 
 #note: these tables work but it has two issues at the moment
 ##one is that is is not using the geometric mean, just mean. 
 ### it is using the min and max value, when we want the min and max mean value across ampling years
 #it is also missing the number of sampling years for each variable. i need to work on calculating that. so far i can't figure out how to do that. 
 #another issue, how does lakewatch handle bottom in thier reports?
-data_means = data_test %>% group_by(Lake) %>% summarise(
-  "Total Phosphorus (µg/L)" = mean(TP, na.rm = TRUE),
-  "Total Nitrogen (µg/L)" = mean(TN, na.rm = TRUE),
-  "Chlorophyll- uncorrected (µg/L)" = mean(CHL, na.rm = TRUE),
-  "Secchi (ft)" = mean(SECCHI_ft, na.rm = TRUE),
-  "Secchi (m)" = mean(SECCHI_ft, na.rm = TRUE)*0.3,
-  "Color (Pt-Co Units)" = mean(Color, na.rm = TRUE),
-  "Specific Conductance (µS/cm@25 C)" = mean(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean") #%>% select(-Lake)
+data_means = lake%>% group_by(Lake_County) %>% summarise(
+  "Total Phosphorus (µg/L)" = gmean(TP),
+  "Total Nitrogen (µg/L)" = gmean(TN),
+  "Chlorophyll- uncorrected (µg/L)" = gmean(CHL),
+  "Secchi (ft)" = gmean(SECCHI_ft),
+  "Secchi (m)" = gmean(SECCHI_ft)*0.3,
+  "Color (Pt-Co Units)" = gmean(Color),
+  "Specific Conductance (µS/cm@25 C)" = gmean(Cond_uS),
+  "Lake Classification" = ""
+  ) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
 
 
 
-data_mins = data_test %>% group_by(Lake) %>% summarise(
+data_mins = lake %>% group_by(Lake_County) %>%  summarise(
   "Total Phosphorus (µg/L)" = min(TP, na.rm = TRUE),
   "Total Nitrogen (µg/L)" = min(TN, na.rm = TRUE),
   "Chlorophyll- uncorrected (µg/L)" = min(CHL, na.rm = TRUE),
@@ -124,9 +161,10 @@ data_mins = data_test %>% group_by(Lake) %>% summarise(
   "Secchi (m)" = min(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = min(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = min(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "min")  #%>% select(-Lake)
+  "Lake Classification" = unique(lake_class) #you must use unique on this character column apparently. otherwise it get much longer than it should be. 
+  ) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
 
-data_max = data_test %>% group_by(Lake) %>% summarise(
+data_max = lake %>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
   "Total Nitrogen (µg/L)" = max(TN, na.rm = TRUE),
   "Chlorophyll- uncorrected (µg/L)" = max(CHL, na.rm = TRUE),
@@ -134,16 +172,15 @@ data_max = data_test %>% group_by(Lake) %>% summarise(
   "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") 
-#%>% select(-Lake)
+  "Lake Classification" = ""
+  ) %>% pivot_longer(cols = 2:9, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
 
 
-data_years = data_test %>% group_by(Lake) %>% summarise(
-  "Total Phosphorus (µg/L)" = sum(is.na(TP))
+#data_years = data_test %>% group_by(Lake) %>% summarise(
+ # "Total Phosphorus (µg/L)" = sum(is.na(TP))
 
  #this is not correct still, work in progress
-
-) #%>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") %>% select(-Lake)
+ #%>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "max") %>% select(-Lake)
 
 
 
@@ -151,8 +188,8 @@ data_combined = full_join(data_mins,data_max, by = "parameter")
 data_combined = full_join(data_combined,data_means, by = "parameter")
 ```
 
-```{r echo = FALSE}
-table_test <- gt(data = data_combined) %>% cols_label(
+```{r table_2_gt, echo = FALSE}
+table_two <- gt(data = data_combined) %>% cols_label(
   parameter = "Parameter",
   min = "Minimum<br>Annual Geometric Means",
   max = "Maximum<br>Annual Geometric Means",
@@ -162,16 +199,23 @@ table_test <- gt(data = data_combined) %>% cols_label(
   columns = c(min, max, mean),
   decimals = 1
 ) %>% tab_header(
-  title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))
+  title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))  
 
+gtsave(table_two, filename = "table_2.png", path = "output/output_table")
 
-table_test
 
 ```
 
-### Table 3. Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons. 
 
 ```{r}
+knitr::include_graphics("output/output_table/table_2.png")
+```
+
+
+
+### Table 3. Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons. 
+
+```{r table_3, include=FALSE}
 ### TABLE 3 CODE ###
 
 #geometric means by year
@@ -244,9 +288,9 @@ gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE)
 
 this is an example of the phosphorous graph, work in progress still
 
+Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p < 0.05 is significant). Trend Status are reported on plots.
 
-
-```{r}
+```{r p_graph}
 
 #lm for graph to refer to 
 
@@ -254,9 +298,15 @@ total_p_lm = lm(TP ~ Year, data = lake)
 
 total_p_table = glance(total_p_lm)
 
-label = (glue("R<sup>2</sup> = {round(total_p_table$r.squared, 2)}"))
+trend = if_else(total_p_table$p.value >= 0.5, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+  
+plot_title = glue("Total Phosphorus (µg/L) by Year for Lake {lake$Lake[1]} in {lake$County[1]} County")  
+  
 
+label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
 
+maxlim = max(lake$TP)+10
+minlim = min(lake$TP)
 
 total_p_graph = ggplot(data = lake, aes(x = Year, y = TP)) +
   geom_point() +
@@ -267,16 +317,134 @@ total_p_graph = ggplot(data = lake, aes(x = Year, y = TP)) +
       if_else(total_p_table$p.value <= 0.5,true = "solid", false = "dashed" )
       )
     ) +
-  labs(title = "Total Phosphorus (µg/L) by Year", x = "Year", y = "Total Phosphorus (µg/L)")+
+  labs(title = plot_title, x = "Year", y = "Total Phosphorus (µg/L)")+
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
     label = label
-    ,x = (min(lake$Year)+5),
-    y = (max(lake$TP)+5),
-    )+ylim(min(lake$TP), max(lake$TP)+10)
+    ,x = (min(lake$Year, na.rm = TRUE)+5),
+    y = (max(lake$TP, na.rm = TRUE)+5),
+    )+ylim(minlim, maxlim)
 
 
 show(total_p_graph)
 ```
+
+
+
+```{r n_graph}
+total_n_lm = lm(TN ~ Year, data = lake)
+
+total_n_table = glance(total_n_lm)
+
+trend = if_else(total_n_table$p.value >= 0.5, true = "No trend", false = if_else(total_n_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+  
+plot_title = glue("Total Nitrogen (µg/L) by Year for Lake {lake$Lake[1]} in {lake$County[1]} County")  
+  
+
+label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
+
+maxlim = max(lake$TN)+10
+minlim = min(lake$TN)
+
+total_n_graph = ggplot(data = lake, aes(x = Year, y = TN)) +
+  geom_point() +
+  geom_smooth(
+    method = "lm", 
+    se = FALSE, 
+    linetype = paste(
+      if_else(total_n_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      )
+    ) +
+  labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)")+
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
+    label = label
+    ,x = (min(lake$Year, na.rm = TRUE)+5),
+    y = (max(lake$TN, na.rm = TRUE)+5),
+    )+ylim(minlim, maxlim)
+
+
+show(total_n_graph)
+```
+
+Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p < 0.05 is significant). Trend status are reported on plots.
+
+
+```{r chl_graph}
+total_chl_lm = lm(CHL ~ Year, data = lake)
+
+total_chl_table = glance(total_chl_lm)
+
+trend = if_else(total_chl_table$p.value >= 0.5, true = "No trend", false = if_else(total_chl_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+  
+plot_title = glue("Total Chlorophyll (µg/L) by Year for Lake {lake$Lake[1]} in {lake$County[1]} County")  
+  
+
+label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
+
+maxlim = max(lake$CHL)+10
+minlim = min(lake$CHL)
+
+total_chl_graph = ggplot(data = lake, aes(x = Year, y = CHL)) +
+  geom_point() +
+  geom_smooth(
+    method = "lm", 
+    se = FALSE, 
+    linetype = paste(
+      if_else(total_chl_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      )
+    ) +
+  labs(title = plot_title, x = "Year", y = "Total Chlorophyll (µg/L)")+
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
+    label = label
+    ,x = (min(lake$Year,na.rm = TRUE)+5),
+    y = (max(lake$CHL, na.rm = TRUE)+5),
+    )+ylim(minlim, maxlim)
+
+show(total_chl_graph)
+
+
+```
+
+```{r secchi_graph}
+total_secchi_lm = lm(SECCHI_ft ~ Year, data = lake)
+
+total_secchi_table = glance(total_secchi_lm)
+
+trend = if_else(total_secchi_table$p.value >= 0.5, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+  
+plot_title = glue("Secchi Depth (ft) by Year for Lake {lake$Lake[1]} in {lake$County[1]} County")  
+  
+
+label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
+
+maxlim = max(lake$SECCHI_ft, na.rm = TRUE)+10
+minlim = min(lake$SECCHI_ft, na.rm = TRUE)
+
+total_secchi_graph = ggplot(data = lake, aes(x = Year, y = SECCHI_ft)) +
+  geom_point() +
+  geom_smooth(
+    method = "lm", 
+    se = FALSE, 
+    linetype = paste(
+      if_else(total_secchi_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      )
+    ) +
+  labs(title = plot_title, x = "Year", y = "Secchi depth (ft)")+
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
+    label = label,
+    x = (min(lake$Year, na.rm = TRUE)+5),
+    y = (max(lake$SECCHI_ft, na.rm = TRUE)+5)
+    )+ylim(minlim, maxlim)
+  
+
+
+
+show(total_secchi_graph)
+
+```
+
 
 
