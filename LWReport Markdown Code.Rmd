@@ -38,25 +38,25 @@ library(readxl)
 
 ### Loading and Preparing Data
 
-path <- "C:/Users/amber.riner/Documents/LWreports"
-setwd(path)
-
-data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
-data_1 <- data_1 %>%
-  mutate(Lake_County = paste(Lake, County)) %>%
-  filter(Study == "LW") %>%
-  filter(`water type` == "Lake") 
-head(data_1)
-
-data_2 = read.csv("All_Data.csv")
-data_2 = data_2 %>%
-  mutate(Station = as.character(Station)) %>%
-  mutate(Lake_County = paste(Lake, County)) 
-head(data_2)
-
-data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
-
-Lake = data_all %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+# path <- "C:/Users/amber.riner/Documents/LWreports"
+# setwd(path)
+# 
+# data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+# data_1 <- data_1 %>%
+#   mutate(Lake_County = paste(Lake, County)) %>%
+#   filter(Study == "LW") %>%
+#   filter(`water type` == "Lake") 
+# head(data_1)
+# 
+# data_2 = read.csv("All_Data.csv")
+# data_2 = data_2 %>%
+#   mutate(Station = as.character(Station)) %>%
+#   mutate(Lake_County = paste(Lake, County)) 
+# head(data_2)
+# 
+# data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
+# 
+# Lake = data_all %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
 
 ##################################################################################
 
@@ -72,13 +72,13 @@ gmean <- function(x){
 
 #adding a column using if/else for lake classification
 ##this code currently has no fallback for if the data is missing.
-Lake = Lake %>% mutate(lake_class = ifelse(
+Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
   gmean(`Color`) > 40, "Colored", ifelse(
     gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
 
 #adding a column using if/else for trophic state
 
-Lake = Lake %>% mutate(trophic_state = ifelse(
+Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
   gmean(CHL) < 3, "Oligotrophic", ifelse(
     gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
       gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
@@ -135,7 +135,7 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 ### it is using the min and max value, when we want the min and max mean value across ampling years
 #it is also missing the number of sampling years for each variable. i need to work on calculating that. so far i can't figure out how to do that. 
 #another issue, how does lakewatch handle bottom in thier reports?
-data_means = Lake%>% group_by(Lake_County) %>% summarise(
+data_means = Lake_2%>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = gmean(TP),
   "Total Nitrogen (µg/L)" = gmean(TN),
   "Chlorophyll- uncorrected (µg/L)" = gmean(CHL),
@@ -148,7 +148,7 @@ data_means = Lake%>% group_by(Lake_County) %>% summarise(
 
 
 
-data_mins = Lake %>% group_by(Lake_County) %>%  summarise(
+data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
   "Total Phosphorus (µg/L)" = min(TP, na.rm = TRUE),
   "Total Nitrogen (µg/L)" = min(TN, na.rm = TRUE),
   "Chlorophyll- uncorrected (µg/L)" = min(CHL, na.rm = TRUE),
@@ -159,7 +159,7 @@ data_mins = Lake %>% group_by(Lake_County) %>%  summarise(
   "Lake Classification" = unique(lake_class) #you must use unique on this character column apparently. otherwise it get much longer than it should be. 
   ) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
 
-data_max = Lake %>% group_by(Lake_County) %>% summarise(
+data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
   "Total Nitrogen (µg/L)" = max(TN, na.rm = TRUE),
   "Chlorophyll- uncorrected (µg/L)" = max(CHL, na.rm = TRUE),
@@ -211,7 +211,7 @@ knitr::include_graphics("output/output_table/table_2.png")
 ### TABLE 3 CODE ###
 
 #geometric means by year
-byyr <- Lake %>%
+byyr <- Lake_2 %>%
   group_by(Year) %>%
   summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft))
 
@@ -228,21 +228,21 @@ tsi_tp <- 14.42* ln(ggtp) + 4.15
 tsi <- mean(tsi_sd, tsi_chl, tsi_tp)
 
 #define variables
-cnty <- Lake$County.x[1] #county
-name <- Lake$Lake.x[1] #name
-pr <- paste(min(Lake$Year), " to ", max(Lake$Year)) #period of record
+cnty <- Lake_2$County[1] #county
+name <- Lake_2$Lake[1] #name
+pr <- paste(min(Lake_2$Year), " to ", max(Lake_2$Year)) #period of record
 lts <- ifelse(tsi < 40 , "Oligotrophic", 
               (ifelse(tsi < 50 , "Mesotrophic",
                (ifelse(tsi < 70, "Eutrophic", "Hypereutrophic")))))  #lake trophic status
-tpz <- Lake$`TP Zone`[1] #tp zone
+tpz <- Lake_1$`TP Zone`[1] #tp zone
 gtp <- paste(ggtp, "(", min(byyr$`gmean(TP)`), " to ", max(byyr$`gmean(TP)`) , ")" ) #grand total phosphorous
-tnz <- Lake$`TN Zone`[1]
+tnz <- Lake_1$`TN Zone`[1]
 gtn <- paste(ggtn, "(", min(byyr$`gmean(TN)`), " to ", max(byyr$`gmean(TN)`), ")") #grand tn geomean
-gnis <- Lake$GNIS_ID[1]
-lat <- Lake$Latitude[1]
-long <- Lake$Longitude[1]
-wbt <- Lake$`water type`[1]
-sa <- paste(Lake$`SA (hectare)`[1], "ha, ", Lake$`SA (acres)`[1], "acres")
+gnis <- Lake_1$GNIS_ID[1]
+lat <- Lake_1$Latitude[1]
+long <- Lake_1$Longitude[1]
+wbt <- Lake_1$`water type`[1]
+sa <- paste(Lake_1$`SA (hectare)`[1], "ha, ", Lake_1$`SA (acres)`[1], "acres")
 
 
 ### IF Statements (Before I had access to the base file).  Will possible use later
@@ -289,21 +289,21 @@ Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual
 
 #lm for graph to refer to 
 
-total_p_lm = lm(TP ~ Year, data = Lake)
+total_p_lm = lm(TP ~ Year, data = Lake_2)
 
 total_p_table = glance(total_p_lm)
 
 trend = if_else(total_p_table$p.value >= 0.5, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Total Phosphorus (µg/L) by Year for Lake {Lake$Lake[1]} in {Lake$County[1]} County")  
+plot_title = glue("Total Phosphorus (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake$TP)+10
-minlim = min(Lake$TP)
+maxlim = max(Lake_2$TP)+10
+minlim = min(Lake_2$TP)
 
-total_p_graph = ggplot(data = Lake, aes(x = Year, y = TP)) +
+total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
@@ -316,8 +316,8 @@ total_p_graph = ggplot(data = Lake, aes(x = Year, y = TP)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
     label = label
-    ,x = (min(Lake$Year, na.rm = TRUE)+5),
-    y = (max(Lake$TP, na.rm = TRUE)+5),
+    ,x = (min(Lake_2$Year, na.rm = TRUE)+5),
+    y = (max(Lake_2$TP, na.rm = TRUE)+5),
     )+ylim(minlim, maxlim)
 
 
@@ -327,21 +327,21 @@ show(total_p_graph)
 
 
 ```{r n_graph}
-total_n_lm = lm(TN ~ Year, data = Lake)
+total_n_lm = lm(TN ~ Year, data = Lake_2)
 
 total_n_table = glance(total_n_lm)
 
 trend = if_else(total_n_table$p.value >= 0.5, true = "No trend", false = if_else(total_n_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Total Nitrogen (µg/L) by Year for Lake {Lake$Lake[1]} in {lake$County[1]} County")  
+plot_title = glue("Total Nitrogen (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake$TN)+10
-minlim = min(Lake$TN)
+maxlim = max(Lake_2$TN)+10
+minlim = min(Lake_2$TN)
 
-total_n_graph = ggplot(data = Lake, aes(x = Year, y = TN)) +
+total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
@@ -354,8 +354,8 @@ total_n_graph = ggplot(data = Lake, aes(x = Year, y = TN)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
     label = label
-    ,x = (min(Lake$Year, na.rm = TRUE)+5),
-    y = (max(Lake$TN, na.rm = TRUE)+5),
+    ,x = (min(Lake_2$Year, na.rm = TRUE)+5),
+    y = (max(Lake_2$TN, na.rm = TRUE)+5),
     )+ylim(minlim, maxlim)
 
 
@@ -366,19 +366,19 @@ Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual aver
 
 
 ```{r chl_graph}
-total_chl_lm = lm(CHL ~ Year, data = Lake)
+total_chl_lm = lm(CHL ~ Year, data = Lake_2)
 
 total_chl_table = glance(total_chl_lm)
 
 trend = if_else(total_chl_table$p.value >= 0.5, true = "No trend", false = if_else(total_chl_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Total Chlorophyll (µg/L) by Year for Lake {Lake$Lake[1]} in {lake$County[1]} County")  
+plot_title = glue("Total Chlorophyll (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake$CHL)+10
-minlim = min(Lake$CHL)
+maxlim = max(Lake_2$CHL)+10
+minlim = min(Lake_2$CHL)
 
 total_chl_graph = ggplot(data = Lake, aes(x = Year, y = CHL)) +
   geom_point() +
@@ -393,8 +393,8 @@ total_chl_graph = ggplot(data = Lake, aes(x = Year, y = CHL)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
     label = label
-    ,x = (min(lake$Year,na.rm = TRUE)+5),
-    y = (max(lake$CHL, na.rm = TRUE)+5),
+    ,x = (min(Lake_2$Year,na.rm = TRUE)+5),
+    y = (max(Lake_2$CHL, na.rm = TRUE)+5),
     )+ylim(minlim, maxlim)
 
 show(total_chl_graph)
@@ -403,21 +403,21 @@ show(total_chl_graph)
 ```
 
 ```{r secchi_graph}
-total_secchi_lm = lm(SECCHI_ft ~ Year, data = Lake)
+total_secchi_lm = lm(SECCHI_ft ~ Year, data = Lake_2)
 
 total_secchi_table = glance(total_secchi_lm)
 
 trend = if_else(total_secchi_table$p.value >= 0.5, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Secchi Depth (ft) by Year for Lake {Lake$Lake[1]} in {lake$County[1]} County")  
+plot_title = glue("Secchi Depth (ft) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake$SECCHI_ft, na.rm = TRUE)+10
-minlim = min(Lake$SECCHI_ft, na.rm = TRUE)
+maxlim = max(Lake_2$SECCHI_ft, na.rm = TRUE)+10
+minlim = min(Lake_2$SECCHI_ft, na.rm = TRUE)
 
-total_secchi_graph = ggplot(data = Lake, aes(x = Year, y = SECCHI_ft)) +
+total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
@@ -430,8 +430,8 @@ total_secchi_graph = ggplot(data = Lake, aes(x = Year, y = SECCHI_ft)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
     label = label,
-    x = (min(Lake$Year, na.rm = TRUE)+5),
-    y = (max(Lake$SECCHI_ft, na.rm = TRUE)+5)
+    x = (min(Lake_2$Year, na.rm = TRUE)+5),
+    y = (max(Lake_2$SECCHI_ft, na.rm = TRUE)+5)
     )+ylim(minlim, maxlim)
   
 
