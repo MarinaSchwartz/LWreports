@@ -6,6 +6,10 @@ setwd(path)
 ### Import Libraries ###
 library(readxl)
 library(tidyverse)
+library(tinytex)
+
+#tinytex::install_tinytex()
+#tinytex::tlmgr_update()
 
 
 ### Loading and Preparing Data
@@ -22,9 +26,10 @@ data_2 = data_2 %>%
   mutate(Lake_County = paste(Lake, County)) 
 head(data_2)
 
-data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
+#data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
 
-Lakes = unique(data_all$Lake_County)
+#Lakes = unique(data_2$Lake_County)
+Lakes = c("Alice Alachua", "Bivans Arm Alachua")
 print(Lakes)
 
 n = 1
@@ -34,22 +39,29 @@ N = length(Lakes)
 
 for(l in Lakes){
  #subsets data for lake of interest
- Lake <- data_all %>%
+  
+Lake_1 <- data_1 %>%
+  filter(Lake_County == l)
+  
+Lake_2 <- data_2 %>%
   filter(Lake_County == l) 
-  file_name = paste(Lake[1], ".pdf")
+  file_name = paste(Lake_2[1], ".pdf")
 
  ########################################################
   ###put code for knitting pdf from markdown code here###
  
- #rmarkdown::render("LWReport Markdown Code.Rmd", params = list(
-   #file = filename)) 
+ rmarkdown::render(input = "LWReport Markdown Code.Rmd", output_format = "pdf_document",         # 2. Establish the format
+                   output_file = paste0(l ,"_report.pdf"), # 3. Define the output file name
+                   output_dir = "output",                       # 4. Define an output folder/directory
+                   params = list(Lakes = l))  
   ###this section doesn't work right now, but the for loop works
   
  ########################################################
  
  #counter
-  print(Lake$Lake_County[1])
+  print(Lake_2$Lake_County[1])
   print(paste(n, "/", N))
   n <- n+1
 }
+
 
