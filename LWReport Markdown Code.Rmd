@@ -2,39 +2,47 @@
 output:
   pdf_document: default
   html_document: default
+params:
+  Lakes: 0
 ---
-```{r}
+
+```{r tinytex update, include=FALSE}
 #tinytex::tlmgr_update()
 ```
 
----
-title: "lakewatch lake template batch processing"
-output:
-  pdf_document: default
-  html_document: default
-params: 
-  lake: "lake county"
----
+```{r document option, include=FALSE}
+
+#this line will hit all code chunks
+##change to echo = TRUE to diagnose code issues
+knitr::opts_chunk$set(echo = FALSE)
+#this will suppress any warning messages related to all the code, including warnings about statistics. 
+####change to echo = TRUE to diagnose statistical issues
+knitr::opts_chunk$set(warning = FALSE)
+#this hids code messages, in particular "`geom_smooth()` using formula = 'y ~ x'" from the graphs
+##change to echo = TRUE to diagnose code issues
+knitr::opts_chunk$set(message = FALSE)
 
 
-```{r include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#have to add this. this code tells rmarkdown to not try remove html tags, allows for use of html to format GT table objects.
+options(gt.html_tag_check = FALSE)
+
+
 ```
 
-```{r data_processing,  eval=TRUE, include=FALSE}
+```{r data_processing,  eval=TRUE}
 ###IMPORTING LIBRARIES AND LOADING DATA###
 ##########################################################################################
 #Commenting out this code to add to the for loop file
 #importing libraries 
-library(tidyverse)
-library(gt)
-library(SciViews)
-library(broom)
+#library(tidyverse)
+#library(gt)
+#library(SciViews)
+#library(broom)
 #broom is just to get values form lm function in easier to reference from
-library(glue)
-library(ggtext)
+#library(glue)
+#library(ggtext)
 #glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
-library(readxl)
+#library(readxl)
 
 ### Loading and Preparing Data
 
@@ -72,23 +80,33 @@ gmean <- function(x){
 
 #adding a column using if/else for lake classification
 ##this code currently has no fallback for if the data is missing.
-Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
-  gmean(`Color`) > 40, "Colored", ifelse(
-    gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+#Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
+  #gmean(`Color`) > 40, "Colored", ifelse(
+  #  gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
 
 #adding a column using if/else for trophic state
 
-Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
-  gmean(CHL) < 3, "Oligotrophic", ifelse(
-    gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
-      gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+#Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
+  #gmean(CHL) < 3, "Oligotrophic", ifelse(
+   # gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+      #gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
 
-#have to add this. this code tells rmarkdown to not try remove html tags, allows for use of html to format GT table objects.
-options(gt.html_tag_check = FALSE)
+
 
 ```
 
-## Florida LAKEWATCH Report for «Lake» in «County» County Using Data Downloaded 12/9/2022
+```{r get date, }
+#getting date
+date = Sys.Date()
+date = format(date, format="%B %d %Y")
+##for what ever reason this chunk is ignoring the echo and message flags global options. set it manuelly to false
+```
+
+```{r title,  echo=FALSE}
+report_title = glue("Florida LAKEWATCH Report for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County Using Data Downloaded {date}", )
+```
+
+## `r report_title`
 
 ### Introduction for Lakes
 
@@ -114,20 +132,18 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 
 ### Table 1. Florida Department of Environmental Protection's Numeric Nutrient Criteria for lakes.
 
-![1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
+[1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
 
-```{r table_one_image, include=TRUE}
+```{r table_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
+
 knitr::include_graphics("LW Reports Table 1 V.2.png")
+
 
 ```
 
-
-
 For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
 
-
-
-```{r table_2_data, include=FALSE}
+```{r table_2_data}
 
 
 #note: these tables work but it has two issues at the moment
@@ -196,16 +212,17 @@ table_two <- gt(data = data_combined) %>% cols_label(
 ) %>% tab_header(
   title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))  
 
+
+
+#amber figured this out. if we knit using gttable to pdf we get massive issues. this is because GTtable does not support kniting to pdf. if we save as a png file, knitr can knit this png file to the document just fine. 
 gtsave(table_two, filename = "table_2.png", path = "output/output_table")
 
 
 ```
 
-
-```{r}
+```{r table 2, out.width= "500px", fig.align='center'}
 knitr::include_graphics("output/output_table/table_2.png")
 ```
-
 
 ```{r}
 ### TABLE 3 CODE ###
@@ -275,15 +292,12 @@ table_three = gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_nu
 gtsave(table_three, filename = "table_3.png", path = "output/output_table")
 
 ```
-```{r, out.width = "25%"}
+
+```{r table 3, out.width= "500px", fig.align='center'}
 knitr::include_graphics("output/output_table/table_3.png")
 ```
 
-#graph example
-
-this is an example of the phosphorous graph, work in progress still
-
-Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p < 0.05 is significant). Trend Status are reported on plots.
+Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
 
 ```{r p_graph}
 
@@ -321,10 +335,19 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
     )+ylim(minlim, maxlim)
 
 
-show(total_p_graph)
+#show(total_p_graph)
+##commented out so the graph does not show up twice. 
+
+
+#we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
+ggsave("output/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+
 ```
 
+```{r}
 
+knitr::include_graphics("output/output_graphs/total_p_graph.png")
+```
 
 ```{r n_graph}
 total_n_lm = lm(TN ~ Year, data = Lake_2)
@@ -359,11 +382,21 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
     )+ylim(minlim, maxlim)
 
 
-show(total_n_graph)
+#show(total_n_graph)
+##commented out so the graph does not show up twice.
+
+ggsave("output/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+
+
 ```
 
-Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p < 0.05 is significant). Trend status are reported on plots.
+```{r}
 
+knitr::include_graphics("output/output_graphs/total_n_graph.png")
+
+```
+
+Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend status are reported on plots.
 
 ```{r chl_graph}
 total_chl_lm = lm(CHL ~ Year, data = Lake_2)
@@ -380,7 +413,7 @@ label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> 
 maxlim = max(Lake_2$CHL)+10
 minlim = min(Lake_2$CHL)
 
-total_chl_graph = ggplot(data = Lake, aes(x = Year, y = CHL)) +
+total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
@@ -397,8 +430,15 @@ total_chl_graph = ggplot(data = Lake, aes(x = Year, y = CHL)) +
     y = (max(Lake_2$CHL, na.rm = TRUE)+5),
     )+ylim(minlim, maxlim)
 
-show(total_chl_graph)
+#show(total_chl_graph)
+##commented out so the graph does not show up twice.
+ggsave("output/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
+```
+
+```{r}
+
+knitr::include_graphics("output/output_graphs/total_chl_graph.png")
 
 ```
 
@@ -437,9 +477,15 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 
 
 
-show(total_secchi_graph)
+#show(total_secchi_graph)
+###commented out so the graph does not show up twice.
+ggsave("output/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
+```{r}
+
+knitr::include_graphics("output/output_graphs/total_secchi_graph.png")
 
 
+```

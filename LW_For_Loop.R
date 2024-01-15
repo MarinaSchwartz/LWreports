@@ -1,11 +1,22 @@
 ### Set WD ###
-path <- "C:/Users/amber.riner/Documents/LWreports"
-setwd(path)
+#path <- "C:/Users/amber.riner/Documents/LWreports"
+#setwd(path)
 
 
 ### Import Libraries ###
-library(readxl)
+###IMPORTING LIBRARIES AND LOADING DATA###
+##########################################################################################
+#Commenting out this code to add to the for loop file
+#importing libraries 
 library(tidyverse)
+library(gt)
+library(SciViews)
+library(broom)
+#broom is just to get values form lm function in easier to reference from
+library(glue)
+library(ggtext)
+#glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
+library(readxl)
 library(tinytex)
 
 #tinytex::install_tinytex()
@@ -46,6 +57,27 @@ Lake_1 <- data_1 %>%
 Lake_2 <- data_2 %>%
   filter(Lake_County == l) 
   file_name = paste(Lake_2[1], ".pdf")
+  
+  gmean <- function(x){
+    xc <- x[!is.na(x)]
+    xg <- exp(mean(log(xc[xc>0])))
+    xg <- round(xg)
+    return(xg)
+  } 
+  
+  
+  #adding a column using if/else for lake classification
+  ##this code currently has no fallback for if the data is missing.
+  Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
+    gmean(`Color`) > 40, "Colored", ifelse(
+      gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+  
+  #adding a column using if/else for trophic state
+  
+  Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
+    gmean(CHL) < 3, "Oligotrophic", ifelse(
+      gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+        gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
 
  ########################################################
   ###put code for knitting pdf from markdown code here###
