@@ -54,7 +54,6 @@ Lake_2 <- data_2 %>%
                    output_file = paste0(l ,"_report.pdf"), # 3. Define the output file name
                    output_dir = "output",                       # 4. Define an output folder/directory
                    params = list(Lakes = l))  
-  ###this section doesn't work right now, but the for loop works
   
  ########################################################
  
