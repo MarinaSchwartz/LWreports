@@ -1,8 +1,3 @@
-### Set WD ###
-#path <- "C:/Users/amber.riner/Documents/LWreports"
-#setwd(path)
-
-
 ### Import Libraries ###
 ###IMPORTING LIBRARIES AND LOADING DATA###
 ##########################################################################################

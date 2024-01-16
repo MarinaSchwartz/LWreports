@@ -224,7 +224,7 @@ gtsave(table_two, filename = "table_2.png", path = "output/output_table")
 knitr::include_graphics("output/output_table/table_2.png")
 ```
 
-```{r}
+```{r table_3 code}
 ### TABLE 3 CODE ###
 
 #geometric means by year
@@ -340,11 +340,11 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("output/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("output/output_graphs/total_p_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
-```{r}
+```{r total p graph out, out.width= "450px",fig.align = "center"}
 
 knitr::include_graphics("output/output_graphs/total_p_graph.png")
 ```
@@ -385,12 +385,12 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 #show(total_n_graph)
 ##commented out so the graph does not show up twice.
 
-ggsave("output/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("output/output_graphs/total_n_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 
 ```
 
-```{r}
+```{r total n graph out, out.width= "450px",fig.align = "center"}
 
 knitr::include_graphics("output/output_graphs/total_n_graph.png")
 
@@ -432,11 +432,11 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
-ggsave("output/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("output/output_graphs/total_chl_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
-```{r}
+```{r chl graph out, out.width= "500px",fig.align = "center"}
 
 knitr::include_graphics("output/output_graphs/total_chl_graph.png")
 
@@ -479,11 +479,11 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
-ggsave("output/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("output/output_graphs/total_secchi_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
-```{r}
+```{r secchi_graph out, out.width= "500px",fig.align = "center"}
 
 knitr::include_graphics("output/output_graphs/total_secchi_graph.png")
 
