@@ -95,15 +95,9 @@ gmean <- function(x){
 
 ```
 
-```{r get date, }
-#getting date
-date = Sys.Date()
-date = format(date, format="%B %d %Y")
-##for what ever reason this chunk is ignoring the echo and message flags global options. set it manuelly to false
-```
 
 ```{r title,  echo=FALSE}
-report_title = glue("Florida LAKEWATCH Report for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County Using Data Downloaded {date}", )
+report_title = glue("Florida LAKEWATCH Report for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
 ```
 
 ## `r report_title`
@@ -323,7 +317,7 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
     method = "lm", 
     se = FALSE, 
     linetype = paste(
-      if_else(total_p_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Total Phosphorus (µg/L)")+
@@ -354,7 +348,7 @@ total_n_lm = lm(TN ~ Year, data = Lake_2)
 
 total_n_table = glance(total_n_lm)
 
-trend = if_else(total_n_table$p.value >= 0.5, true = "No trend", false = if_else(total_n_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(total_n_table$p.value >= 0.05, true = "No trend", false = if_else(total_n_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
 plot_title = glue("Total Nitrogen (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
@@ -403,7 +397,7 @@ total_chl_lm = lm(CHL ~ Year, data = Lake_2)
 
 total_chl_table = glance(total_chl_lm)
 
-trend = if_else(total_chl_table$p.value >= 0.5, true = "No trend", false = if_else(total_chl_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(total_chl_table$p.value >= 0.05, true = "No trend", false = if_else(total_chl_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
 plot_title = glue("Total Chlorophyll (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
@@ -419,7 +413,7 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
     method = "lm", 
     se = FALSE, 
     linetype = paste(
-      if_else(total_chl_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      if_else(total_chl_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Total Chlorophyll (µg/L)")+
