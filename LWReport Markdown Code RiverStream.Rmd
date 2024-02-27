@@ -97,47 +97,103 @@ gmean <- function(x){
 
 
 ```{r title,  echo=FALSE}
-report_title = glue("Florida LAKEWATCH Report for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
+report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
+
+#Need to add "Watershed Region:" which is in Nutrient Watershed Region column in Basefile MS
 ```
 
 ## `r report_title`
+## Watershed Region: 
 
-### Introduction for Lakes
+### Introduction for River/Streams
 
-This report summarizes data collected on systems that have been part of the LAKEWATCH program. Data are from the period of record for individual systems. Part one allows the comparison of data with Florida Department of Environmental Protection's Numeric Nutrient Criteria. Part two allows a comparison of the long-term mean nutrient concentrations with nutrient zone concentrations published by LAKEWATCH staff (Bachmann et al. 2012; <https://lakewatch.ifas.ufl.edu/resources/bibliography/>). Finally, this report examines data for long-term trends that may be occurring in individual systems but only for systems with **five or more years of data**. Step by step instructions on how to use the data tables are provided on page 4 of this report.
+This report summarizes data collected on systems that have been part of the LAKEWATCH program. Data are from the period of record for individual systems. The first part of this summary lists background data for each system, the second part lists the long-term data geometric means and ranges and the final part are the trend plots for nutrients, chlorophyll and Secchi depth. Plots were only made for systems with five or more years of data.
 
-### Florida Department of Environmental Protection (FDEP) Nutrient Criteria for Lakes (Table 1)
+For decades Florida has had a narrative nutrient water quality criterion in place to protect Florida’s waters against nutrient over-enrichment. In 2009, the Florida Department of Environmental Protection (FDEP) initiated rulemaking and, by 2011, adopted what would be the first set of statewide numeric nutrient standards for Florida’s waters. By 2015, almost all the remaining waters in Florida have numeric nutrient standards (see for FDEP Regulation Nutrient Criteria’s for: Streams, spring vents: https://www.flrules.org/gateway/RuleNo.asp?title=SURFACE%20WATER%20QUALITY%20STANDARDS&ID=62-302.531).
 
-For lakes, the numeric interpretations of the nutrient criterion in paragraph 62-302.530(47)(b), F.A.C., based on chlorophyll are shown in Table 1. The applicable interpretations for TN and TP will vary on an annual basis, depending on the availability and concentration of chlorophyll data for the lake. The numeric interpretations for TN, TP, and chlorophyll shall not be exceeded more than once in any consecutive three year period.
+### Figure 1. Map showing nutrient thresholds areas for streams set forth by FDEP.
 
-a.  If annual geometric mean chlorophyll does not exceed the chlorophyll value for one of three lake classification groups listed in the table below, then the TN and TP numeric interpretations for that calendar year shall be the annual geometric means of the maximum calculated numeric interpretation in Table 1.
+```{r Figure_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
 
-b.  If there are insufficient data to calculate the annual geometric mean chlorophyll for a given year or the annual geometric mean chlorophyll exceeds the values in Table 1 for the correct lake classification group, then the applicable numeric interpretations for TN and TP shall be the minimum values in Table 1.
+knitr::include_graphics("Figure 1 RiverStream.png")
 
-### Long-Term Data Summary for Lakes (Table 2): Definitions
+```
 
+### Table 1. The nutrient thresholds for streams are listed in table below along with the map showing zones. 
+
+```{r table_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
+
+knitr::include_graphics("Table 1 RiverStream.png")
+```
+
+
+### Base File Data for River/Streams: Definitions
+
+
+-   **County:** Name of county in which the system resides. 
+-   **Name:** Stream name that LAKEWATCH uses for the system.
+-   **GNIS Number:** Number created by USGS's Geographic Names Information System.
+-   **Water Body Type:** Four different types of systems; lakes, estuaries, river/streams and springs.
+-   **Period of Record (years):** Number of years a system has been in the LAKEWATCH program.
+-   **Latitude and Longitude:** Coordinates identifying the exact location of station 1 for each system.
+
+
+
+### Table 2. Base File Data
+
+
+```{r table_2_data}
+
+#define variables
+cnty <- Lake_2$County[1] #county
+name <- Lake_2$Lake[1] #name
+gnis <- Lake_1$GNIS_ID[1]
+wbt <- Lake_1$`water type`[1]
+pr <- paste(min(Lake_2$Year), " to ", max(Lake_2$Year)) #period of record
+lat <- Lake_1$Latitude[1]
+long <- Lake_1$Longitude[1]
+
+
+#add values to array
+rowval <- c(cnty, name, gnis, wbt, pr, lat, long)
+
+#add row names to array – see if you can change pr "year" to "years, range" MS
+rowname <- c("County", "Name", "GNIS Number", "Water Body Type", "Period of Record (year)", "Latitude", "Longitude")
+
+
+#make dataframe with rownames and row values
+Tbl2df <- data.frame(rowname, rowval)
+#make gt table
+table_two = gt(tbl2df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
+  decimals = 1
+) %>% tab_header(
+  title = md("**Table 2.** Base File Data."))  
+
+gtsave(table_two, filename = "table_2.png", path = "output/output_table")
+
+```
+
+```{r table 2, out.width= "500px", fig.align='center'}
+knitr::include_graphics("output/output_table/table_2.png")
+```
+
+
+
+### Long-Term Data for River/Streams: Definitions
+
+The following long-term data are the primary trophic state parameters collected by LAKEWATCH volunteers and classification variables color and specific conductance (LAKEWATCH recently began analyzing samples quarterly for color and specific conductance):
 -   **Total Phosphorus (µg/L):** Nutrient most often limiting growth of plant/algae.
 -   **Total Nitrogen (µg/L):** Nutrient needed for aquatic plant/algae growth but only limiting when nitrogen to phosphorus ratios are generally less than 10 (by mass).
 -   **Chlorophyll-uncorrected (µg/L):** Chlorophyll concentrations are used to measure relative abundances of open water algae.
 -   **Secchi (ft), Secchi (m):** Secchi measurements are estimates of water clarity.
 -   **Color (Pt-Co Units):** LAKEWATCH measures true color, which is the color of the water after particles have been filtered out.
 -   **Specific Conductance (µS/cm \@ 25 C):** Measurement of the ability of water to conduct electricity and can be used to estimate the amount of dissolved materials in water.
--   **Lake Classification:** Numeric nutrient criteria for Florida require that lakes must first be classified into one of three group based on color and alkalinity or specific conductance; **colored lakes** (color greater than 40 Pt-Co units), **clear soft water lakes** (color less than or equal to 40 Pt-Co units and alkalinity less than or equal to 20 mg/L as CaCO3 or specific conductance less than or equal to 100 µs/cm @25 C), and **clear hard water lakes** (color less than 40 Pt-Co units and alkalinity greater than 20 mg/L as CaCO3 or specific conductance greater 100 µS/cm \@ 25 C).
-
-### Table 1. Florida Department of Environmental Protection's Numeric Nutrient Criteria for lakes.
-
-[1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
-
-```{r table_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
-
-knitr::include_graphics("LW Reports Table 1 V.2.png")
 
 
-```
 
-For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
+### Table 3. Long-term trophic state data collected monthly by LAKEWATCH volunteers and color and specific conductance (collected quarterly).
 
-```{r table_2_data}
+```{r table_3_data}
 
 
 #note: these tables work but it has two issues at the moment
@@ -145,6 +201,7 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 ### it is using the min and max value, when we want the min and max mean value across ampling years
 #it is also missing the number of sampling years for each variable. i need to work on calculating that. so far i can't figure out how to do that. 
 #another issue, how does lakewatch handle bottom in thier reports?
+
 data_means = Lake_2%>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = gmean(TP),
   "Total Nitrogen (µg/L)" = gmean(TN),
@@ -153,9 +210,7 @@ data_means = Lake_2%>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = gmean(SECCHI_ft)*0.3,
   "Color (Pt-Co Units)" = gmean(Color),
   "Specific Conductance (µS/cm@25 C)" = gmean(Cond_uS),
-  "Lake Classification" = ""
-  ) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
-
+) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
 
 
 data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
@@ -166,8 +221,7 @@ data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
   "Secchi (m)" = min(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = min(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = min(Cond_uS, na.rm = TRUE),
-  "Lake Classification" = unique(lake_class) #you must use unique on this character column apparently. otherwise it get much longer than it should be. 
-  ) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
 
 data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
@@ -177,8 +231,7 @@ data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
-  "Lake Classification" = ""
-  ) %>% pivot_longer(cols = 2:9, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:9, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
 
 
 #data_years = data_test %>% group_by(Lake) %>% summarise(
@@ -193,8 +246,8 @@ data_combined = full_join(data_mins,data_max, by = "parameter")
 data_combined = full_join(data_combined,data_means, by = "parameter")
 ```
 
-```{r table_2_gt, echo = FALSE}
-table_two <- gt(data = data_combined) %>% cols_label(
+```{r table_3_gt, echo = FALSE}
+table_three <- gt(data = data_combined) %>% cols_label(
   parameter = "Parameter",
   min = "Minimum<br>Annual Geometric Means",
   max = "Maximum<br>Annual Geometric Means",
@@ -204,91 +257,19 @@ table_two <- gt(data = data_combined) %>% cols_label(
   columns = c(min, max, mean),
   decimals = 1
 ) %>% tab_header(
-  title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))  
+  title = md("**Table 3.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and color and specific conductance (collected quarterly)."))
 
 
 
-#amber figured this out. if we knit using gttable to pdf we get massive issues. this is because GTtable does not support kniting to pdf. if we save as a png file, knitr can knit this png file to the document just fine. 
-gtsave(table_two, filename = "table_2.png", path = "output/output_table")
+#amber figured this out. if we knit using gttable to pdf we get massive issues. this is because GTtable does not support kniting to pdf. if we save as a png file, knitr can knit this png file to the document just fine.
 
+gtsave(table_three, filename = "table_3.png", path = "Lake/output_table")
 
-```
-
-```{r table 2, out.width= "500px", fig.align='center'}
-knitr::include_graphics("output/output_table/table_2.png")
-```
-
-```{r table_3 code}
-### TABLE 3 CODE ###
-
-#geometric means by year
-byyr <- Lake_2 %>%
-  group_by(Year) %>%
-  summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft))
-
-#total geometric means means 
-ggtp <- gmean(byyr$`gmean(TP)`)
-ggtn <- gmean(byyr$`gmean(TN)`)
-ggchl <- gmean(byyr$`gmean(CHL)`) 
-ggsec <- gmean(byyr$`gmean(SECCHI_ft)`)
-
-#calculate TSI
-tsi_sd <- 60 -14.41*ln(ggsec)
-tsi_chl <- 9.81* ln(ggchl) + 30.6
-tsi_tp <- 14.42* ln(ggtp) + 4.15
-tsi <- mean(tsi_sd, tsi_chl, tsi_tp)
-
-#define variables
-cnty <- Lake_2$County[1] #county
-name <- Lake_2$Lake[1] #name
-pr <- paste(min(Lake_2$Year), " to ", max(Lake_2$Year)) #period of record
-lts <- ifelse(tsi < 40 , "Oligotrophic", 
-              (ifelse(tsi < 50 , "Mesotrophic",
-               (ifelse(tsi < 70, "Eutrophic", "Hypereutrophic")))))  #lake trophic status
-tpz <- Lake_1$`TP Zone`[1] #tp zone
-gtp <- paste(ggtp, "(", min(byyr$`gmean(TP)`), " to ", max(byyr$`gmean(TP)`) , ")" ) #grand total phosphorous
-tnz <- Lake_1$`TN Zone`[1]
-gtn <- paste(ggtn, "(", min(byyr$`gmean(TN)`), " to ", max(byyr$`gmean(TN)`), ")") #grand tn geomean
-gnis <- Lake_1$GNIS_ID[1]
-lat <- Lake_1$Latitude[1]
-long <- Lake_1$Longitude[1]
-wbt <- Lake_1$`water type`[1]
-sa <- paste(Lake_1$`SA (hectare)`[1], "ha, ", Lake_1$`SA (acres)`[1], "acres")
-
-
-### IF Statements (Before I had access to the base file).  Will possible use later
-# tpz <- ifelse(ggtp >= 355, "TP6", 
-#               (ifelse(ggtp >= 252, "TP5",
-#                (ifelse(ggtp >= 93, "TP4",
-#                 (ifelse(ggtp >= 45, "TP3",
-#                  (ifelse(ggtp >= 21, "TP2","TP1"))))))))) #tp zone
-# tnz <- ifelse(ggtn >= 2701, "TN6", 
-#               (ifelse(ggtn >= 1369, "TN5",
-#                (ifelse(ggtn >= 1087, "TN4",
-#                 (ifelse(ggtn >= 642, "TN3",
-#                  (ifelse(ggtn >= 450, "TN2","TN1"))))))))) #tn zone
-
-
-#add values to array
-rowval <- c(cnty, name, gnis, lat, long, wbt, sa, pr, lts, tpz, gtp, tnz, gtn )
-
-#add row names to array
-rowname <- c("County", "Name", "GNIS Number", "Latitude", "Longitude", "Water Body Type", "Surface Area (ha and acre)", "Period of Record (year)", "Lake Tophic Status (CHL)", "TP Zone", "Grand TP Geometric Mean Concentration (ug/ L, min, and max.)", "TN Zone", "Grand TN Geometric Mean Concentration (ug/ L, min, and max.)")
-
-#make dataframe with rownames and row values
-tbl3df <- data.frame(rowname, rowval)
-#make gt table
-table_three = gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
-  decimals = 1
-) %>% tab_header(
-  title = md("**Table 3.** Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons."))  
-
-gtsave(table_three, filename = "table_3.png", path = "output/output_table")
 
 ```
 
 ```{r table 3, out.width= "500px", fig.align='center'}
-knitr::include_graphics("output/output_table/table_3.png")
+knitr::include_graphics("Lake/output_table/table_3.png")
 ```
 
 Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
