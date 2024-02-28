@@ -215,7 +215,7 @@ gtsave(table_two, filename = "table_2.png", path = "Lake/output_table")
 ```{r table 2, out.width= "500px", fig.align='center'}
 knitr::include_graphics("Lake/output_table/table_2.png")
 ```
-
+\newpage
 ### Base File Data for Lakes: Definitions
 
 -   **County:** Name of county in which the system resides.
@@ -305,7 +305,7 @@ gtsave(table_three, filename = "table_3.png", path = "Lake/output_table")
 knitr::include_graphics("Lake/output_table/table_3.png")
 ```
 
-```{r Figure_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
+```{r Figure_one_image, echo=FALSE, out.width= "900px", fig.align='center',}
 
 knitr::include_graphics("LW Reports Figure 1.png")
 
@@ -313,6 +313,44 @@ knitr::include_graphics("LW Reports Figure 1.png")
 
 Figure 1. Maps showing Florida phosphorus and nitrogen zones and the nutrient concentrations of the upper 90% of lakes within each zone (Bachmann et al. 2012). Explanation on how to interpret the Nutrient Zones on page 4.
 
+**Interpreting FDEP’s Numeric Nutrient Criteria (NNC): These are instructions for using Table 1 and 2 to determine impairment status based on FDEP’s NNC.**
+
+1.  Identify your lake’s *Lake Classification* in Table 2 (Colored, Clear Hard Water, or Clear Soft Water) (if no classification is listed then there is not enough data available to classify your lake).
+
+    a.  The *Lake Classification* tells you which row to use in Table 1.
+
+2.  Identify your waterbody’s *Grand Geometric Mean* Chlorophyll-uncorrected in Table 2.
+
+    a.  Compare this number to the *Annual Geometric Mean Chlorophyll-corrected* (2^nd^ column) in Table 1.
+
+    b.  If your lake’s Chlorophyll-uncorrected concentration is greater than the *Annual Geometric Mean Chlorophyll-corrected* concentration use the *Minimum calculated numeric interpretation* columns.
+
+    c.  If your lake’s *Chlorophyll-uncorrected* concentration is less than the *Annual Geometric Mean Chlorophyll-corrected* concentration use the *Maximum calculated numeric interpretation* columns.
+
+3.  Identify your lake’s Total Phosphorus and Total Nitrogen *Grand Geometric Mean* concentration in Table 2 and compare them to the appropriate *Annual Geometric Mean Total Phosphorus* and *Annual Geometric Mean Total Nitrogen* values in Table 1.
+
+4.  If your lake’s concentrations from Table 2 are greater than FDEP’s NNC values from Table 1, your lake may be considered impaired. If they are below, it may be considered unimpaired.
+
+**Nutrient Zones and “Natural Background”**
+
+Administrative code definitions 62-302.200 (19): “Natural background” shall mean the condition of waters in the absence of man-induced alterations based on the best scientific information available to the Department. The establishment of natural background for an altered waterbody may be based upon a similar unaltered waterbody, historical pre-alteration data, paleolimnological examination of sediment cores, or examination of geology and soils. When determining natural background conditions for a lake, the lake’s location and regional characteristics as described and depicted in the U.S. Environmental Protection Agency document titled Lake Regions of Florida (EPA/R-97/127, dated 1997, U.S. Environmental Protection Agency, National Health and Environmental Effects Research Laboratory, Corvallis, OR) ([http://www.flrules.org/Gateway/reference.asp?No=Ref-06267),](http://www.flrules.org/Gateway/reference.asp?No=Ref-06267),) which is incorporated by reference herein, shall also be considered. The lake regions in this document are grouped Nutrient Zones according to ambient total phosphorus and total nitrogen concentrations listed in Table 1 found in Bachmann, R. W., Bigham D. L., Hoyer M. V., Canfield D. E, Jr. 2012. A strategy for establishing numeric nutrient criteria for Florida lakes. Lake Reservoir Management. 28:84-92.
+
+**Interpreting Florida LAKEWATCH’s Nutrient Zones: These are instructions for using Table 3 and Figure 1 to determine nutrient status based on Nutrient Zones.**
+
+1.  Identify your lake’s TP Zone in Table 3.
+
+    a.  Locate this TP Zone (left map) and its corresponding nutrient concentration in Figure 1.
+
+2.  Locate your lake’s Long-Term Grand Geometric Mean TP Concentration value in Table 3.
+
+3.  Compare your lake’s Long-Term Grand Geometric Mean TP Concentration from Table 3 to the appropriate TP Zone nutrient concentration from Figure 1.
+
+    a.  If your lake’s Long-Term Grand Geometric Mean TP Concentration number is higher than the TP zone nutrient concentration, your lake’s nutrient concentration is above “Natural Background”.
+
+    b.  If your lake’s Long-Term Grand Geometric Mean TP Concentration number is lower than the TP zone nutrient concentration, your lake’s nutrient concentration is within “Natural Background”.
+
+4.  Repeat these same steps with the TN Zone and Long-term Grand Geometric Mean TN Concentration.
+\newpage
 Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
 
 ```{r p_graph}
@@ -356,11 +394,11 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("Lake/output_graphs/total_p_graph.png", width = 7, height = 6, units = "in", dpi = 300)
+ggsave("Lake/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
-```{r total p graph out, out.width= "475px",fig.align = "center"}
+```{r total p graph out, out.width= "400px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_p_graph.png")
 ```
@@ -401,17 +439,17 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 #show(total_n_graph)
 ##commented out so the graph does not show up twice.
 
-ggsave("Lake/output_graphs/total_n_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 
 ```
 
-```{r total n graph out, out.width= "450px",fig.align = "center"}
+```{r total n graph out, out.width= "400px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_n_graph.png")
 
 ```
-
+\newpage
 Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend status are reported on plots.
 
 ```{r chl_graph}
@@ -448,11 +486,11 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
-ggsave("Lake/output_graphs/total_chl_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Lake/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
-```{r chl graph out, out.width= "450px",fig.align = "center"}
+```{r chl graph out, out.width= "400px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_chl_graph.png")
 
@@ -495,11 +533,11 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
-ggsave("Lake/output_graphs/total_secchi_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Lake/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
-```{r secchi_graph out, out.width= "450px",fig.align = "center"}
+```{r secchi_graph out, out.width= "400px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_secchi_graph.png")
 
