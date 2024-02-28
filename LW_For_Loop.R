@@ -18,8 +18,6 @@ library(tinytex)
 #tinytex::tlmgr_update()
 
 
-setwd("C:/Users/amber.riner/Documents/LWreports")
-
 ### Loading and Preparing Data
 data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
 data_1 <- data_1 %>%
@@ -35,7 +33,8 @@ data_2 = data_2 %>%
   mutate(Lake_County = paste(Lake, County)) 
 head(data_2)
 
-#data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
+data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
+head(data_all)
 
 #Lakes = unique(data_1$Lake_County)
 Lakes = c("Alice Alachua", "Bivans Arm Alachua")

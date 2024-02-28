@@ -7,7 +7,7 @@ params:
 ---
 
 ```{r tinytex update, include=FALSE}
-#tinytex::tlmgr_update()
+tinytex::tlmgr_update()
 ```
 
 ```{r document option, include=FALSE}
@@ -46,25 +46,24 @@ options(gt.html_tag_check = FALSE)
 
 ### Loading and Preparing Data
 
-# path <- "C:/Users/amber.riner/Documents/LWreports"
-# setwd(path)
-# 
-# data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
-# data_1 <- data_1 %>%
-#   mutate(Lake_County = paste(Lake, County)) %>%
-#   filter(Study == "LW") %>%
-#   filter(`water type` == "Lake") 
+
+ 
+ #data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+ #data_1 <- data_1 %>%
+   #mutate(Lake_County = paste(Lake, County)) %>%
+   #filter(Study == "LW") %>%
+   #filter(`water type` == "Lake") 
 # head(data_1)
-# 
-# data_2 = read.csv("All_Data.csv")
-# data_2 = data_2 %>%
-#   mutate(Station = as.character(Station)) %>%
-#   mutate(Lake_County = paste(Lake, County)) 
+ 
+ #data_2 = read.csv("All_Data.csv")
+ #data_2 = data_2 %>%
+  # mutate(Station = as.character(Station)) %>%
+  # mutate(Lake_County = paste(Lake, County)) 
 # head(data_2)
-# 
+ 
 # data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
-# 
-# Lake = data_all %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
+ 
+ #Lake = data_all %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
 
 ##################################################################################
 
@@ -72,32 +71,31 @@ options(gt.html_tag_check = FALSE)
 
 #calculates geometric mean
 gmean <- function(x){
-  xc <- x[!is.na(x)]
+ xc <- x[!is.na(x)]
   xg <- exp(mean(log(xc[xc>0])))
   xg <- round(xg)
   return(xg)
-} 
+}
 
 #adding a column using if/else for lake classification
 ##this code currently has no fallback for if the data is missing.
-#Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
-  #gmean(`Color`) > 40, "Colored", ifelse(
-  #  gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
+  gmean(`Color`) > 40, "Colored", ifelse(
+    gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
 
 #adding a column using if/else for trophic state
 
-#Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
-  #gmean(CHL) < 3, "Oligotrophic", ifelse(
-   # gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
-      #gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
+ gmean(CHL) < 3, "Oligotrophic", ifelse(
+    gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+      gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
 
 
 
 ```
 
-
 ```{r title,  echo=FALSE}
-report_title = glue("Florida LAKEWATCH Report for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
+report_title = glue::glue("Florida LAKEWATCH Report for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024")
 ```
 
 ## `r report_title`
@@ -126,14 +124,14 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 
 ### Table 1. Florida Department of Environmental Protection's Numeric Nutrient Criteria for lakes.
 
-[1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
-
 ```{r table_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
 
 knitr::include_graphics("LW Reports Table 1 V.2.png")
 
 
 ```
+
+[1 For lakes with color \> 40 PCU in the West Central Nutrient Watershed Region, the maximum TP limit shall be the 490 µg/L TP streams threshold for the region.]
 
 For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be assessed as true color and shall be free from turbidity. Lake color and alkalinity shall be the long-term geometric mean, based on a minimum of ten data points over at least three years with at least one data point in each year. If insufficient alkalinity data are available, long-term geometric mean specific conductance values shall be used, with a value of \<100 µS/cm\@25 C used to estimate the mg/L CaCO~3~ alkalinity concentration until such time that alkalinity data are available.
 
@@ -218,6 +216,22 @@ gtsave(table_two, filename = "table_2.png", path = "Lake/output_table")
 knitr::include_graphics("Lake/output_table/table_2.png")
 ```
 
+### Base File Data for Lakes: Definitions
+
+-   **County:** Name of county in which the system resides.
+-   **Name:** Stream name that LAKEWATCH uses for the system.
+-   **GNIS Number:** Number created by USGS's Geographic Names Information System.
+-   **Water Body Type:** Four different types of systems; lakes, estuaries, river/streams and springs.
+-   **Period of Record (years):** Number of years a system has been in the LAKEWATCH program.
+-   **Latitude and Longitude:** Coordinates identifying the exact location of station 1 for each system.
+-   **Water Body Type:** Four different types of systems; lakes, estuaries, river/streams and springs.
+-   **Surface Area (ha and acre):** LAKEWATCH lists the surface area of a lake if it is available.
+-   **Mean Depth (m and ft):** This mean depth is calculated from multiple depth finder transects across a lake that LAKEWATCH uses for estimating plant abundances.
+-   **Period of Record (year):** Years a lake has been in the LAKEWATCH program.
+-   **TP Zone and TN Zone:** Nutrient zones defined by Bachmann et al (2012).
+-   **Long-Term TP and TN Geometric Mean Concentration (µg/L: min and max):** Grand Geometric Means of all annual geometric means (µg/L) with minimum and maximum annual geometric means.
+-   **Lake Trophic Status (CHL):** Tropic state classification using the long-term chlorophyll average.
+
 ```{r table_3 code}
 ### TABLE 3 CODE ###
 
@@ -279,7 +293,7 @@ rowname <- c("County", "Name", "GNIS Number", "Latitude", "Longitude", "Water Bo
 tbl3df <- data.frame(rowname, rowval)
 #make gt table
 table_three = gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
-  decimals = 1
+  decimals = 4,drop_trailing_zeros = TRUE,
 ) %>% tab_header(
   title = md("**Table 3.** Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons."))  
 
@@ -290,6 +304,14 @@ gtsave(table_three, filename = "table_3.png", path = "Lake/output_table")
 ```{r table 3, out.width= "500px", fig.align='center'}
 knitr::include_graphics("Lake/output_table/table_3.png")
 ```
+
+```{r Figure_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
+
+knitr::include_graphics("LW Reports Figure 1.png")
+
+```
+
+Figure 1. Maps showing Florida phosphorus and nitrogen zones and the nutrient concentrations of the upper 90% of lakes within each zone (Bachmann et al. 2012). Explanation on how to interpret the Nutrient Zones on page 4.
 
 Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
 
@@ -315,7 +337,7 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
-    se = FALSE, 
+    se = TRUE, alpha=0.15,
     linetype = paste(
       if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
@@ -334,11 +356,11 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("Lake/output_graphs/total_p_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Lake/output_graphs/total_p_graph.png", width = 7, height = 6, units = "in", dpi = 300)
 
 ```
 
-```{r total p graph out, out.width= "450px",fig.align = "center"}
+```{r total p graph out, out.width= "475px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_p_graph.png")
 ```
@@ -430,7 +452,7 @@ ggsave("Lake/output_graphs/total_chl_graph.png", width = 8, height = 6, units = 
 
 ```
 
-```{r chl graph out, out.width= "500px",fig.align = "center"}
+```{r chl graph out, out.width= "450px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_chl_graph.png")
 
@@ -477,7 +499,7 @@ ggsave("Lake/output_graphs/total_secchi_graph.png", width = 8, height = 6, units
 
 ```
 
-```{r secchi_graph out, out.width= "500px",fig.align = "center"}
+```{r secchi_graph out, out.width= "450px",fig.align = "center"}
 
 knitr::include_graphics("Lake/output_graphs/total_secchi_graph.png")
 
