@@ -201,6 +201,8 @@ table_two <- gt(data = data_combined) %>% cols_label(
 ) %>% fmt_number(
   columns = c(min, max, mean),
   decimals = 1
+) %>% opt_table_font(
+  stack = "transitional"
 ) %>% tab_header(
   title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))  
 
@@ -294,6 +296,8 @@ tbl3df <- data.frame(rowname, rowval)
 #make gt table
 table_three = gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
   decimals = 4,drop_trailing_zeros = TRUE,
+) %>% opt_table_font(
+  stack = "transitional"
 ) %>% tab_header(
   title = md("**Table 3.** Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons."))  
 
