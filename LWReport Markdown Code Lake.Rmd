@@ -203,6 +203,34 @@ table_two <- gt(data = data_combined) %>% cols_label(
   decimals = 1
 ) %>% opt_table_font(
   stack = "transitional"
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = min,
+      rows = 8
+    )
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = mean,
+      rows = 1
+    )
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = mean,
+      rows = 2
+    )
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = mean,
+      rows = 3
+    )
 ) %>% tab_header(
   title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and classification variables color and specific conductance (collected quarterly). Values in bold can be used with Table 1 to evaluate compliance with nutrient criteria."))  
 
@@ -217,7 +245,9 @@ gtsave(table_two, filename = "table_2.png", path = "Lake/output_table")
 ```{r table 2, out.width= "500px", fig.align='center'}
 knitr::include_graphics("Lake/output_table/table_2.png")
 ```
+
 \newpage
+
 ### Base File Data for Lakes: Definitions
 
 -   **County:** Name of county in which the system resides.
@@ -298,6 +328,34 @@ table_three = gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_nu
   decimals = 4,drop_trailing_zeros = TRUE,
 ) %>% opt_table_font(
   stack = "transitional"
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = 2,
+      rows = 10
+    )
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = 2,
+      rows = 11
+    )
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = 2,
+      rows = 12
+    )
+) %>%  tab_style(
+    style = 
+      cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = 2,
+      rows = 13
+    )
 ) %>% tab_header(
   title = md("**Table 3.** Base File Data, long-term nutrient grand geometric means and Nutrient Zone classification listing the 90th percentile concentrations in Figure 1. Values in bold can be used for Nutrient Zone comparisons."))  
 
@@ -353,9 +411,7 @@ Administrative code definitions 62-302.200 (19): “Natural background” shall 
 
     b.  If your lake’s Long-Term Grand Geometric Mean TP Concentration number is lower than the TP zone nutrient concentration, your lake’s nutrient concentration is within “Natural Background”.
 
-4.  Repeat these same steps with the TN Zone and Long-term Grand Geometric Mean TN Concentration.
-\newpage
-Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
+4.  Repeat these same steps with the TN Zone and Long-term Grand Geometric Mean TN Concentration. \newpage Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
 
 ```{r p_graph}
 
@@ -453,7 +509,9 @@ ggsave("Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "i
 knitr::include_graphics("Lake/output_graphs/total_n_graph.png")
 
 ```
+
 \newpage
+
 Figure 4 and Figure 5. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend status are reported on plots.
 
 ```{r chl_graph}
