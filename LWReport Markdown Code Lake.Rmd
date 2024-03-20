@@ -141,7 +141,7 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 
 
 #note: these tables work but it has two issues at the moment
-##one is that is is not using the geometric mean, just mean. 
+##03/17/24, according to 
 ### it is using the min and max value, when we want the min and max mean value across ampling years
 #it is also missing the number of sampling years for each variable. i need to work on calculating that. so far i can't figure out how to do that. 
 #another issue, how does lakewatch handle bottom in thier reports?
@@ -153,7 +153,7 @@ data_means = Lake_2%>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = gmean(SECCHI_ft)*0.3,
   "Color (Pt-Co Units)" = gmean(Color),
   "Specific Conductance (µS/cm@25 C)" = gmean(Cond_uS),
-  "Lake Classification" = ""
+  "Lake Classification" = ""#null placeholder value
   ) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
 
 
@@ -177,8 +177,56 @@ data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
-  "Lake Classification" = ""
+  "Lake Classification" = ""#null placeholder value
   ) %>% pivot_longer(cols = 2:9, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
+
+#count the number of years without na values for each parameter. i couldn't figure out a more eligant way to do this. 
+#need to convert the n value to a character to combine with lakeclass, which is a character. converting an empty string to a character doesn't work because it yields NA. in our final table, we want the an empty string. 
+
+tp_n = Lake_2 %>% filter(!is.na(TP)) %>% summarise(
+  "parameter" = "Total Phosphorus (µg/L)",
+  n = as.character(n_distinct(Year))
+  )
+
+tn_n = Lake_2 %>% filter(!is.na(TN)) %>% summarise(
+  "parameter" = "Total Nitrogen (µg/L)",
+  n = as.character(n_distinct(Year))
+  )
+
+chl_n = Lake_2 %>% filter(!is.na(CHL)) %>% summarise(
+  "parameter" = "Chlorophyll- uncorrected (µg/L)",
+  n = as.character(n_distinct(Year))
+  )
+
+secchi_ft_n = Lake_2 %>% filter(!is.na(SECCHI_ft)) %>% summarise(
+  "parameter" = "Secchi (ft)",
+  n = as.character(n_distinct(Year))
+  )
+
+secchi_m_n = Lake_2 %>% filter(!is.na(SECCHI_ft)) %>% summarise(
+  "parameter" = "Secchi (m)",
+  n = as.character(n_distinct(Year))
+  )
+
+color_n = Lake_2 %>% filter(!is.na(Color)) %>% summarise(
+  "parameter" = "Color (Pt-Co Units)",
+  n = as.character(n_distinct(Year))
+  )
+
+cond_n = Lake_2 %>% filter(!is.na(Cond_uS)) %>% summarise(
+  "parameter" = "Specific Conductance (µS/cm@25 C)",
+  n = as.character(n_distinct(Year))
+  )
+
+lake_class_n = Lake_2 %>% summarise(
+  "parameter" = "Lake Classification",
+  n = ""
+  #null placeholder value
+  )
+
+data_n = bind_rows(tp_n, tn_n, chl_n, secchi_ft_n, secchi_m_n, color_n, cond_n, lake_class_n)
+
+
 
 
 #data_years = data_test %>% group_by(Lake) %>% summarise(
@@ -191,6 +239,7 @@ data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
 
 data_combined = full_join(data_mins,data_max, by = "parameter")
 data_combined = full_join(data_combined,data_means, by = "parameter")
+data_combined = full_join(data_combined,data_n, by = "parameter")
 ```
 
 ```{r table_2_gt, echo = FALSE}
@@ -221,16 +270,19 @@ knitr::include_graphics("Lake/output_table/table_2.png")
 ```{r table_3 code}
 ### TABLE 3 CODE ###
 
+
+#total geometric means full data
+ggtp <- gmean(Lake_2$TP)
+ggtn <- gmean(Lake_2$TN)
+ggchl <- gmean(Lake_2$CHL)
+ggsec <- gmean(Lake_2$SECCHI_ft)
+
 #geometric means by year
 byyr <- Lake_2 %>%
   group_by(Year) %>%
   summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft))
 
-#total geometric means means 
-ggtp <- gmean(byyr$`gmean(TP)`)
-ggtn <- gmean(byyr$`gmean(TN)`)
-ggchl <- gmean(byyr$`gmean(CHL)`) 
-ggsec <- gmean(byyr$`gmean(SECCHI_ft)`)
+
 
 #calculate TSI
 tsi_sd <- 60 -14.41*ln(ggsec)
