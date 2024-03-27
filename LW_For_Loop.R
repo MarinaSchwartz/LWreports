@@ -18,6 +18,10 @@ library(tinytex)
 #tinytex::tlmgr_update()
 
 
+
+#setwd("C:/Users/amber.riner/Documents/LWreports")
+
+
 ### Loading and Preparing Data
 data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
 data_1 <- data_1 %>%
