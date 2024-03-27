@@ -4,6 +4,9 @@ output:
   html_document: default
 params:
   Lakes: 0
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 ```{r tinytex update, include=FALSE}
@@ -95,7 +98,6 @@ gmean <- function(x){
 
 ```
 
-
 ```{r title,  echo=FALSE}
 report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
 
@@ -103,36 +105,34 @@ report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$C
 ```
 
 ## `r report_title`
+
 ## Estuary and Estuary Segment:
 
 ### Introduction for Estuaries
 
-This report summarizes data collected on systems that have been part of the LAKEWATCH program. Data are from the period of record for individual systems. The first part of this summary lists background data for each system, the second part lists the long-term data averages and ranges and the final part are trend plots for nutrients, chlorophyll, and Secchi depth. Plots were only made for systems with five or more years of data.
+This report summarizes data collected on systems that have been part of the LAKEWATCH program.
+Data are from the period of record for individual systems.
+The first part of this summary lists background data for each system, the second part lists the long-term data averages and ranges and the final part are trend plots for nutrients, chlorophyll, and Secchi depth. Plots were only made for systems with five or more years of data.
+For more information about the study of Florida waters, please see our series of information circulars "A Beginner’s Guide to Water Management" (<https://lakewatch.ifas.ufl.edu/extension/information-circulars/>).
 
-The near shore Florida coastline is separated into estuary and estuary segments within the estuary. Deeper coastal waters are separated into coastal nutrient regions and coastal nutrient segments within the regions. Numeric nutrient criteria are established for all estuary segments, including criteria for total nitrogen, total phosphorus, and chlorophyll a.  For open ocean coastal waters, numeric criteria are established for chlorophyll a, that is derived from satellite remote sensing techniques. For those locations without defined segments there are narrative nutrient criteria (e.g., Florida Keys Halo Zone).
+The near shore Florida coastline is separated into estuary and estuary segments within the estuary.
+Deeper coastal waters are separated into coastal nutrient regions and coastal nutrient segments within the regions.
+Numeric nutrient criteria are established for all estuary segments, including criteria for total nitrogen, total phosphorus, and chlorophyll a.
+For open ocean coastal waters, numeric criteria are established for chlorophyll a, that is derived from satellite remote sensing techniques.
+For those locations without defined segments there are narrative nutrient criteria (e.g., Florida Keys Halo Zone).
 
-The maps defining individual estuaries and coastal segments can be found at the following link: https://www.flrules.org/Gateway/reference.asp?No=Ref-05420
+The maps defining individual estuaries and coastal segments can be found at the following link: <https://www.flrules.org/Gateway/reference.asp?No=Ref-05420>
 
-The individual nutrient criteria can be found at the following link:
-https://www.flrules.org/gateway/RuleNo.asp?title=SURFACE%20WATER%20QUALITY%20STANDARDS&ID=62-302.532
-
-
-
+The individual nutrient criteria can be found at the following link: <https://www.flrules.org/gateway/RuleNo.asp?title=SURFACE%20WATER%20QUALITY%20STANDARDS&ID=62-302.532>
 
 ### Base File Data for Estuaries: Definitions
 
-
--   **County:** Name of county in which the system resides. 
+-   **County:** Name of county in which the system resides.
 -   **Name:** Stream name that LAKEWATCH uses for the system.
 -   **GNIS Number:** Number created by USGS's Geographic Names Information System.
 -   **Water Body Type:** Four different types of systems; lakes, estuaries, river/streams and springs.
 -   **Period of Record (years):** Number of years a system has been in the LAKEWATCH program.
 -   **Latitude and Longitude:** Coordinates identifying the exact location of station 1 for each system.
-
-
-
-### Table 1. Base File Data
-
 
 ```{r table_1_data}
 
@@ -154,36 +154,40 @@ rowname <- c("County", "Name", "GNIS Number", "Water Body Type", "Period of Reco
 
 
 #make dataframe with rownames and row values
-Tbl1df <- data.frame(rowname, rowval)
+tbl1df <- data.frame(rowname, rowval)
 #make gt table
 table_one = gt(tbl1df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
   decimals = 1
+) %>% opt_table_font(
+  stack = "transitional"
 ) %>% tab_header(
-  title = md("**Table 1.** Base File Data."))  
+  title = md("**Table 1.** Base File Data - have to find a way to make this table the correct width without adding a super long title to it"))  
 
-gtsave(table_one, filename = "table_1.png", path = "output/output_table")
+gtsave(table_one, filename = "table_1.png", path = "estuary/output_table")
 
 ```
 
 ```{r table 1, out.width= "500px", fig.align='center'}
-knitr::include_graphics("output/output_table/table_1.png")
+knitr::include_graphics("estuary/output_table/table_1.png")
 ```
 
-
+\newpage
 
 ### Long-Term Data for Estuaries: Definitions
 
 The following long-term data are the primary trophic state parameters collected by LAKEWATCH volunteers and classification variables color and specific conductance (LAKEWATCH recently began analyzing samples quarterly for color and specific conductance):
+
 -   **Total Phosphorus (µg/L):** Nutrient most often limiting growth of plant/algae.
+
 -   **Total Nitrogen (µg/L):** Nutrient needed for aquatic plant/algae growth but only limiting when nitrogen to phosphorus ratios are generally less than 10 (by mass).
+
 -   **Chlorophyll-uncorrected (µg/L):** Chlorophyll concentrations are used to measure relative abundances of open water algae.
+
 -   **Secchi (ft), Secchi (m):** Secchi measurements are estimates of water clarity.
+
 -   **Color (Pt-Co Units):** LAKEWATCH measures true color, which is the color of the water after particles have been filtered out.
+
 -   **Specific Conductance (µS/cm \@ 25 C):** Measurement of the ability of water to conduct electricity and can be used to estimate the amount of dissolved materials in water.
-
-
-
-### Table 2. Long-term trophic state data collected monthly by LAKEWATCH volunteers and color and specific conductance (collected quarterly).
 
 ```{r table_2_data}
 
@@ -202,7 +206,7 @@ data_means = Lake_2%>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = gmean(SECCHI_ft)*0.3,
   "Color (Pt-Co Units)" = gmean(Color),
   "Specific Conductance (µS/cm@25 C)" = gmean(Cond_uS),
-) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
 
 
 data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
@@ -213,7 +217,7 @@ data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
   "Secchi (m)" = min(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = min(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = min(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
 
 data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
@@ -223,7 +227,7 @@ data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:9, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
 
 
 #data_years = data_test %>% group_by(Lake) %>% summarise(
@@ -248,6 +252,8 @@ table_three <- gt(data = data_combined) %>% cols_label(
 ) %>% fmt_number(
   columns = c(min, max, mean),
   decimals = 1
+) %>% opt_table_font(
+  stack = "transitional"
 ) %>% tab_header(
   title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and color and specific conductance (collected quarterly)."))
 
@@ -255,16 +261,20 @@ table_three <- gt(data = data_combined) %>% cols_label(
 
 #amber figured this out. if we knit using gttable to pdf we get massive issues. this is because GTtable does not support kniting to pdf. if we save as a png file, knitr can knit this png file to the document just fine.
 
-gtsave(table_two, filename = "table_2.png", path = "Lake/output_table")
-
+gtsave(table_two, filename = "table_2.png", path = "Estuary/output_table")
 
 ```
 
 ```{r table 2, out.width= "500px", fig.align='center'}
-knitr::include_graphics("Lake/output_table/table_2.png")
+knitr::include_graphics("Estuary/output_table/table_2.png")
 ```
 
-Figure 1 and Figure 2. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
+\newpage
+
+##Figure 1 and Figure 2.
+Trend plots of annual average total phosphorus and annual average total nitrogen versus year.
+The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant).
+Trend Status are reported on plots.
 
 ```{r p_graph}
 
@@ -276,7 +286,7 @@ total_p_table = glance(total_p_lm)
 
 trend = if_else(total_p_table$p.value >= 0.5, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Total Phosphorus (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
+plot_title = glue("Total Phosphorus (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
@@ -288,7 +298,7 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
-    se = FALSE, 
+    se = TRUE, alpha=0.15,
     linetype = paste(
       if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
@@ -307,13 +317,13 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("output/output_graphs/total_p_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Estuary/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
-```{r total p graph out, out.width= "450px",fig.align = "center"}
+```{r total p graph out, out.width= "400px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_p_graph.png")
+knitr::include_graphics("Estuary/output_graphs/total_p_graph.png")
 ```
 
 ```{r n_graph}
@@ -323,7 +333,7 @@ total_n_table = glance(total_n_lm)
 
 trend = if_else(total_n_table$p.value >= 0.05, true = "No trend", false = if_else(total_n_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Total Nitrogen (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
+plot_title = glue("Total Nitrogen (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
@@ -352,18 +362,23 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 #show(total_n_graph)
 ##commented out so the graph does not show up twice.
 
-ggsave("output/output_graphs/total_n_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Estuary/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 
 ```
 
-```{r total n graph out, out.width= "450px",fig.align = "center"}
+```{r total n graph out, out.width= "400px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_n_graph.png")
+knitr::include_graphics("Estuary/output_graphs/total_n_graph.png")
 
 ```
 
-Figure 3 and Figure 4. Trend plots of annual average chlorophyll and annual average Secchi versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend status are reported on plots.
+\newpage
+
+Figure 4 and Figure 5.
+Trend plots of annual average chlorophyll and annual average Secchi versus year.
+The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p \< 0.05 is significant).
+Trend status are reported on plots.
 
 ```{r chl_graph}
 total_chl_lm = lm(CHL ~ Year, data = Lake_2)
@@ -372,7 +387,7 @@ total_chl_table = glance(total_chl_lm)
 
 trend = if_else(total_chl_table$p.value >= 0.05, true = "No trend", false = if_else(total_chl_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Total Chlorophyll (µg/L) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
+plot_title = glue("Total Chlorophyll (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
@@ -399,13 +414,13 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
-ggsave("output/output_graphs/total_chl_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Estuary/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
-```{r chl graph out, out.width= "500px",fig.align = "center"}
+```{r chl graph out, out.width= "400px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_chl_graph.png")
+knitr::include_graphics("Estuary/output_graphs/total_chl_graph.png")
 
 ```
 
@@ -416,7 +431,7 @@ total_secchi_table = glance(total_secchi_lm)
 
 trend = if_else(total_secchi_table$p.value >= 0.5, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
-plot_title = glue("Secchi Depth (ft) by Year for Lake {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
+plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
 label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
@@ -446,13 +461,13 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
-ggsave("output/output_graphs/total_secchi_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("Estuary/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
-```{r secchi_graph out, out.width= "500px",fig.align = "center"}
+```{r secchi_graph out, out.width= "400px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_secchi_graph.png")
+knitr::include_graphics("Estuary/output_graphs/total_secchi_graph.png")
 
 
 ```

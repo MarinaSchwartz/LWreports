@@ -39,7 +39,7 @@ options(gt.html_tag_check = FALSE)
 #library(SciViews)
 #library(broom)
 #broom is just to get values form lm function in easier to reference from
-#library(glue)
+library(glue)
 #library(ggtext)
 #glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
 #library(readxl)
@@ -97,6 +97,7 @@ gmean <- function(x){
 
 
 ```{r title,  echo=FALSE}
+
 report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
 
 #Need to add "Watershed Region:" which is in Nutrient Watershed Region column in Basefile MS
@@ -108,6 +109,7 @@ report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$C
 ### Introduction for River/Streams
 
 This report summarizes data collected on systems that have been part of the LAKEWATCH program. Data are from the period of record for individual systems. The first part of this summary lists background data for each system, the second part lists the long-term data geometric means and ranges and the final part are the trend plots for nutrients, chlorophyll and Secchi depth. Plots were only made for systems with five or more years of data.
+For more information about the study of Florida waters, please see our series of information circulars "A Beginner’s Guide to Water Management" (<https://lakewatch.ifas.ufl.edu/extension/information-circulars/>).
 
 For decades Florida has had a narrative nutrient water quality criterion in place to protect Florida’s waters against nutrient over-enrichment. In 2009, the Florida Department of Environmental Protection (FDEP) initiated rulemaking and, by 2011, adopted what would be the first set of statewide numeric nutrient standards for Florida’s waters. By 2015, almost all the remaining waters in Florida have numeric nutrient standards (see for FDEP Regulation Nutrient Criteria’s for: Streams, spring vents: https://www.flrules.org/gateway/RuleNo.asp?title=SURFACE%20WATER%20QUALITY%20STANDARDS&ID=62-302.531).
 
@@ -162,19 +164,19 @@ rowname <- c("County", "Name", "GNIS Number", "Water Body Type", "Period of Reco
 
 
 #make dataframe with rownames and row values
-Tbl2df <- data.frame(rowname, rowval)
+tbl2df <- data.frame(rowname, rowval)
 #make gt table
 table_two = gt(tbl2df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
   decimals = 1
 ) %>% tab_header(
   title = md("**Table 2.** Base File Data."))  
 
-gtsave(table_two, filename = "table_2.png", path = "output/output_table")
+gtsave(table_two, filename = "table_2.png", path = "RiverStream/output_table")
 
 ```
 
 ```{r table 2, out.width= "500px", fig.align='center'}
-knitr::include_graphics("output/output_table/table_2.png")
+knitr::include_graphics("RiverStream/output_table/table_2.png")
 ```
 
 
@@ -210,7 +212,7 @@ data_means = Lake_2%>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = gmean(SECCHI_ft)*0.3,
   "Color (Pt-Co Units)" = gmean(Color),
   "Specific Conductance (µS/cm@25 C)" = gmean(Cond_uS),
-) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "mean",values_transform = list(mean = as.character)) %>% select(-Lake_County)
 
 
 data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
@@ -221,7 +223,7 @@ data_mins = Lake_2 %>% group_by(Lake_County) %>%  summarise(
   "Secchi (m)" = min(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = min(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = min(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:9, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter",values_to = "min",values_transform = list(min = as.character)) %>% select(-Lake_County)
 
 data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Total Phosphorus (µg/L)" = max(TP, na.rm = TRUE),
@@ -231,7 +233,7 @@ data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
   "Secchi (m)" = max(SECCHI_ft, na.rm = TRUE)*0.3,
   "Color (Pt-Co Units)" = max(Color, na.rm = TRUE),
   "Specific Conductance (µS/cm@25 C)" = max(Cond_uS, na.rm = TRUE),
-) %>% pivot_longer(cols = 2:9, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
+) %>% pivot_longer(cols = 2:8, names_to = "parameter", values_to = "max",values_transform = list(max = as.character)) %>% select(-Lake_County)
 
 
 #data_years = data_test %>% group_by(Lake) %>% summarise(
@@ -263,16 +265,17 @@ table_three <- gt(data = data_combined) %>% cols_label(
 
 #amber figured this out. if we knit using gttable to pdf we get massive issues. this is because GTtable does not support kniting to pdf. if we save as a png file, knitr can knit this png file to the document just fine.
 
-gtsave(table_three, filename = "table_3.png", path = "Lake/output_table")
+gtsave(table_three, filename = "table_3.png", path = "RiverStream/output_table")
 
 
 ```
 
 ```{r table 3, out.width= "500px", fig.align='center'}
-knitr::include_graphics("Lake/output_table/table_3.png")
+knitr::include_graphics("RiverStream/output_table/table_3.png")
 ```
 
-Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
+\newpage
+##Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
 
 ```{r p_graph}
 
@@ -315,13 +318,13 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("output/output_graphs/total_p_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("RiverStream/output_graphs/total_p_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
 ```{r total p graph out, out.width= "450px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_p_graph.png")
+knitr::include_graphics("RiverStream/output_graphs/total_p_graph.png")
 ```
 
 ```{r n_graph}
@@ -360,14 +363,14 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 #show(total_n_graph)
 ##commented out so the graph does not show up twice.
 
-ggsave("output/output_graphs/total_n_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("RiverStream/output_graphs/total_n_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 
 ```
 
 ```{r total n graph out, out.width= "450px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_n_graph.png")
+knitr::include_graphics("RiverStream/output_graphs/total_n_graph.png")
 
 ```
 
@@ -407,13 +410,13 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
-ggsave("output/output_graphs/total_chl_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("RiverStream/output_graphs/total_chl_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
 ```{r chl graph out, out.width= "500px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_chl_graph.png")
+knitr::include_graphics("RiverStream/output_graphs/total_chl_graph.png")
 
 ```
 
@@ -454,13 +457,13 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
-ggsave("output/output_graphs/total_secchi_graph.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("RiverStream/output_graphs/total_secchi_graph.png", width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
 ```{r secchi_graph out, out.width= "500px",fig.align = "center"}
 
-knitr::include_graphics("output/output_graphs/total_secchi_graph.png")
+knitr::include_graphics("RiverStream/output_graphs/total_secchi_graph.png")
 
 
 ```
