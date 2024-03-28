@@ -478,7 +478,7 @@ total_p_lm = lm(TP ~ Year, data = Lake_2)
 
 total_p_table = glance(total_p_lm)
 
-trend = if_else(total_p_table$p.value >= 0.5, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(total_p_table$p.value >= 0.05, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
 plot_title = glue("Total Phosphorus (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
@@ -506,6 +506,8 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
     ,x = (min(Lake_2$Year, na.rm = TRUE)+5),
     y = (max(Lake_2$TP, na.rm = TRUE)+5),
     )+ylim(minlim, maxlim)
+
+#+xlim() maybe for axis whole numbers?
 
 
 #show(total_p_graph)
@@ -545,7 +547,7 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
     color = "darkgoldenrod2",
     alpha=0.15,
     linetype = paste(
-      if_else(total_n_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      if_else(total_n_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)")+
@@ -621,7 +623,7 @@ total_secchi_lm = lm(SECCHI_ft ~ Year, data = Lake_2)
 
 total_secchi_table = glance(total_secchi_lm)
 
-trend = if_else(total_secchi_table$p.value >= 0.5, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(total_secchi_table$p.value >= 0.05, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
 plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
@@ -639,7 +641,7 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
     color = "dodgerblue3",
     alpha=0.15,
     linetype = paste(
-      if_else(total_secchi_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      if_else(total_secchi_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Secchi depth (ft)")+
