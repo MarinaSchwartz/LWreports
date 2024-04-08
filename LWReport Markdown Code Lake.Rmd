@@ -464,10 +464,10 @@ Administrative code definitions 62-302.200 (19): “Natural background” shall 
     b.  If your lake’s Long-Term Grand Geometric Mean TP Concentration number is lower than the TP zone nutrient concentration, your lake’s nutrient concentration is within “Natural Background”.
 
 4.  Repeat these same steps with the TN Zone and Long-term Grand Geometric Mean TN Concentration. 
-#\newpage 
+\newpage 
 **Figure 2 and Figure 3. Trend plots of total phosphorus and total nitrogen versus year. The R^2^ value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots as Increasing, Decreasing, or No Trend.**
 ```{r p_graph}
-#how to list all gtraphs for output here? MS
+#how to list all graphs for output here? MS
 
 ###if(tp_n$n >= 5){
   
