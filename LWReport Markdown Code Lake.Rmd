@@ -183,46 +183,54 @@ data_max = Lake_2 %>% group_by(Lake_County) %>% summarise(
 
 tp_n = Lake_2 %>% filter(!is.na(TP)) %>% summarise(
   "parameter" = "Total Phosphorus (µg/L)",
-  n = as.character(n_distinct(Year))
+ #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
 tn_n = Lake_2 %>% filter(!is.na(TN)) %>% summarise(
   "parameter" = "Total Nitrogen (µg/L)",
-  n = as.character(n_distinct(Year))
+   #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
 chl_n = Lake_2 %>% filter(!is.na(CHL)) %>% summarise(
   "parameter" = "Chlorophyll- uncorrected (µg/L)",
-  n = as.character(n_distinct(Year))
+   #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
 secchi_ft_n = Lake_2 %>% filter(!is.na(SECCHI_ft)) %>% summarise(
   "parameter" = "Secchi (ft)",
-  n = as.character(n_distinct(Year))
+   #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
 secchi_m_n = Lake_2 %>% filter(!is.na(SECCHI_ft)) %>% summarise(
   "parameter" = "Secchi (m)",
-  n = as.character(n_distinct(Year))
+   #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
 color_n = Lake_2 %>% filter(!is.na(Color)) %>% summarise(
   "parameter" = "Color (Pt-Co Units)",
-  n = as.character(n_distinct(Year))
+   #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
 cond_n = Lake_2 %>% filter(!is.na(Cond_uS)) %>% summarise(
   "parameter" = "Specific Conductance (µS/cm@25 C)",
-  n = as.character(n_distinct(Year))
+  #n = as.character(n_distinct(Year))
+ n = (n_distinct(Year))
   )
 
-lake_class_n = Lake_2 %>% summarise(
-  "parameter" = "Lake Classification",
-  n = ""
+#Lake_class_n = Lake_2 %>% summarise(
+ #"parameter" = "Lake Classification",
+# n = ""
   #null placeholder value
-  )
+  #)
 
-data_n = bind_rows(tp_n, tn_n, chl_n, secchi_ft_n, secchi_m_n, color_n, cond_n, lake_class_n)
+data_n = bind_rows(tp_n, tn_n, chl_n, secchi_ft_n, secchi_m_n, color_n, cond_n) 
+                   #lake_class_n)
 
 
 
@@ -469,7 +477,7 @@ Administrative code definitions 62-302.200 (19): “Natural background” shall 
 ```{r p_graph}
 #how to list all graphs for output here? MS
 
-###if(tp_n$n >= 5){
+if(tp_n$n >= 5){
   
 #TP Graph
 #lm for graph to refer to 
@@ -516,15 +524,19 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
 ggsave("Lake/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+}
 ```
 
 ```{r total p_graph out, out.width= "400px",fig.align = "center"}
+if(tp_n$n >= 5){
 knitr::include_graphics("Lake/output_graphs/total_p_graph.png")
+}
 ```
 
 ```{r n_graph}
 #TN Graph 
-
+if(tn_n$n >= 5){
+  
 total_n_lm = lm(TN ~ Year, data = Lake_2)
 
 total_n_table = glance(total_n_lm)
@@ -563,10 +575,13 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 ##commented out so the graph does not show up twice.
 
 ggsave("Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+}
 ```
 
 ```{r total n_graph out, out.width= "400px",fig.align = "center"}
+if(tn_n$n >= 5){
 knitr::include_graphics("Lake/output_graphs/total_n_graph.png")
+}
 ```
 \newpage
 
@@ -574,6 +589,8 @@ knitr::include_graphics("Lake/output_graphs/total_n_graph.png")
 
 ```{r chl_graph}
 #chl Graph
+if(chl_n$n >= 5){
+  
 total_chl_lm = lm(CHL ~ Year, data = Lake_2)
 
 total_chl_table = glance(total_chl_lm)
@@ -610,15 +627,19 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
 ggsave("Lake/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+}
 ```
 
 ```{r chl_graph out, out.width= "400px",fig.align = "center"}
+if(chl_n$n >= 5){
 knitr::include_graphics("Lake/output_graphs/total_chl_graph.png")
+}
 ```
 
 ```{r secchi_graph}
 #Secchi Graph
-
+if(secchi_m_n$n >= 5){
+  
 total_secchi_lm = lm(SECCHI_ft ~ Year, data = Lake_2)
 
 total_secchi_table = glance(total_secchi_lm)
@@ -657,11 +678,12 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
 ggsave("Lake/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+}
 
 ```
 
 ```{r secchi_graph out, out.width= "400px",fig.align = "center"}
-
+if(secchi_m_n$n >= 5){
 knitr::include_graphics("Lake/output_graphs/total_secchi_graph.png")
-
+}
 ```
