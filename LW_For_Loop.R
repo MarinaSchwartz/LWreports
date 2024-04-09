@@ -44,7 +44,7 @@ data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
 head(data_all)
 
 #Lakes = unique(data_1$Lake_County)
-Lakes = c("Quarry Collier")
+Lakes = c("Beachwalk C Collier")
 print(Lakes)
 
 n = 1

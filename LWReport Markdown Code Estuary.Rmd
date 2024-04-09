@@ -277,14 +277,18 @@ The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; hi
 Trend Status are reported on plots.
 
 ```{r p_graph}
+#how to list all graphs for output here? MS
 
+###if(tp_n$n >= 5){
+  
+#TP Graph
 #lm for graph to refer to 
 
 total_p_lm = lm(TP ~ Year, data = Lake_2)
 
 total_p_table = glance(total_p_lm)
 
-trend = if_else(total_p_table$p.value >= 0.5, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(total_p_table$p.value >= 0.05, true = "No trend", false = if_else(total_p_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
 plot_title = glue("Total Phosphorus (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
@@ -298,7 +302,9 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
-    se = TRUE, alpha=0.15,
+    se = TRUE, 
+    color = "darkcyan",
+    alpha=0.15,
     linetype = paste(
       if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
@@ -311,22 +317,24 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
     y = (max(Lake_2$TP, na.rm = TRUE)+5),
     )+ylim(minlim, maxlim)
 
+#+xlim() maybe for axis whole numbers?
+
 
 #show(total_p_graph)
 ##commented out so the graph does not show up twice. 
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("Estuary/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
-
+ggsave("Lake/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 ```
 
-```{r total p graph out, out.width= "400px",fig.align = "center"}
-
-knitr::include_graphics("Estuary/output_graphs/total_p_graph.png")
+```{r total p_graph out, out.width= "400px",fig.align = "center"}
+knitr::include_graphics("Lake/output_graphs/total_p_graph.png")
 ```
 
 ```{r n_graph}
+#TN Graph 
+
 total_n_lm = lm(TN ~ Year, data = Lake_2)
 
 total_n_table = glance(total_n_lm)
@@ -345,9 +353,11 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
-    se = FALSE, 
+    se = TRUE, 
+    color = "darkgoldenrod2",
+    alpha=0.15,
     linetype = paste(
-      if_else(total_n_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      if_else(total_n_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)")+
@@ -362,25 +372,18 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 #show(total_n_graph)
 ##commented out so the graph does not show up twice.
 
-ggsave("Estuary/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
-
-
+ggsave("Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 ```
 
-```{r total n graph out, out.width= "400px",fig.align = "center"}
-
-knitr::include_graphics("Estuary/output_graphs/total_n_graph.png")
-
+```{r total n_graph out, out.width= "400px",fig.align = "center"}
+knitr::include_graphics("Lake/output_graphs/total_n_graph.png")
 ```
-
 \newpage
 
-Figure 4 and Figure 5.
-Trend plots of annual average chlorophyll and annual average Secchi versus year.
-The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relations and the p value indicates if the relation is significant (p \< 0.05 is significant).
-Trend status are reported on plots.
+**Figure 4 and Figure 5. Trend plots of total phosphorus and total nitrogen versus year. The R^2^ value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots as Increasing, Decreasing, or No Trend.**
 
 ```{r chl_graph}
+#chl Graph
 total_chl_lm = lm(CHL ~ Year, data = Lake_2)
 
 total_chl_table = glance(total_chl_lm)
@@ -399,7 +402,9 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
-    se = FALSE, 
+    se = TRUE, 
+    color = "forestgreen",
+    alpha=0.15,
     linetype = paste(
       if_else(total_chl_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
@@ -414,22 +419,21 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
-ggsave("Estuary/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
-
+ggsave("Lake/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 ```
 
-```{r chl graph out, out.width= "400px",fig.align = "center"}
-
-knitr::include_graphics("Estuary/output_graphs/total_chl_graph.png")
-
+```{r chl_graph out, out.width= "400px",fig.align = "center"}
+knitr::include_graphics("Lake/output_graphs/total_chl_graph.png")
 ```
 
 ```{r secchi_graph}
+#Secchi Graph
+
 total_secchi_lm = lm(SECCHI_ft ~ Year, data = Lake_2)
 
 total_secchi_table = glance(total_secchi_lm)
 
-trend = if_else(total_secchi_table$p.value >= 0.5, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(total_secchi_table$p.value >= 0.05, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
   
 plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
@@ -443,9 +447,11 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
   geom_point() +
   geom_smooth(
     method = "lm", 
-    se = FALSE, 
+    se = TRUE, 
+    color = "dodgerblue3",
+    alpha=0.15,
     linetype = paste(
-      if_else(total_secchi_table$p.value <= 0.5,true = "solid", false = "dashed" )
+      if_else(total_secchi_table$p.value <= 0.05,true = "solid", false = "dashed" )
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Secchi depth (ft)")+
@@ -458,16 +464,14 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
   
 
 
-
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
-ggsave("Estuary/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("Lake/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 
 ```
 
 ```{r secchi_graph out, out.width= "400px",fig.align = "center"}
 
-knitr::include_graphics("Estuary/output_graphs/total_secchi_graph.png")
-
+knitr::include_graphics("Lake/output_graphs/total_secchi_graph.png")
 
 ```
