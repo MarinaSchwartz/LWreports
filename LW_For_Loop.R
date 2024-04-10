@@ -23,17 +23,17 @@ library(tinytex)
 
 
 ### Loading and Preparing Data
-data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
+data_1 = read_xlsx("Lakewatch Base File RMD.xlsx")
 data_1 <- data_1 %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Alachua") %>%
+  filter(County == "Sarasota") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary") 
 head(data_1)
 
 
 
-data_2 = read.csv("All_Data.csv")
+data_2 = read.csv("All_Data_RMD.csv")
 data_2 = data_2 %>%
   mutate(Station = as.character(Station)) %>%
   mutate(Lake_County = paste(Lake, County)) 
@@ -43,8 +43,8 @@ head(data_2)
 data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
 head(data_all)
 
-#Lakes = unique(data_1$Lake_County)
-Lakes = c("Alto Alachua") #run previous line OR this line -EDM
+Lakes = unique(data_1$Lake_County)
+#Lakes = c("Quarry Collier") #run previous line OR this line -EDM
 print(Lakes)
 
 n = 1
@@ -111,8 +111,8 @@ for(l in Lakes){
  
  #counter
   print(Lake_2$Lake_County[1])
-  print(paste(n, "/", N))
-  n <- n+1
+ # print(paste(n, "/", N))
+ # n <- n+1
 }
 
 
