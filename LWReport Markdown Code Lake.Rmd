@@ -524,7 +524,7 @@ trend = if_else(total_p_table$p.value >= 0.05, true = "No trend", false = if_els
 plot_title = glue("Total Phosphorus (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
-label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
+#label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R^2 = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
 
 
@@ -547,10 +547,8 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5),
         plot.margin=margin(b=20)) + 
-  geom_richtext(
-    label = label,
-    x = (min(Lake_2$Year, na.rm = TRUE)+5),
-    y = (max(Lake_2$TP, na.rm = TRUE)+5))+
+  #geom_richtext(label = label,x = (min(Lake_2$Year, na.rm = TRUE)+5),
+  #              y=(max(Lake_2$TP, na.rm = TRUE)+5))+
   ylim(minlim, maxlim)
 
 #+xlim() maybe for axis whole numbers?
@@ -584,7 +582,7 @@ trend = if_else(total_n_table$p.value >= 0.05, true = "No trend", false = if_els
 plot_title = glue("Total Nitrogen (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
-label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
+#label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R^2 = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 
 
@@ -605,11 +603,10 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
   labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)",caption=paste0(label2))+
   scale_x_continuous(labels=scales::number_format(accuracy=1))+
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
-    label = label
-    ,x = (min(Lake_2$Year, na.rm = TRUE)+5),
-    y = (max(Lake_2$TN, na.rm = TRUE)+5),
-    )+ylim(minlim, maxlim)
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  #geom_richtext(label = label,x = (min(Lake_2$Year, na.rm = TRUE)+5),
+  #              y =(max(Lake_2$TN, na.rm = TRUE)+5),)+
+  ylim(minlim, maxlim)
 
 
 #show(total_n_graph)
@@ -641,7 +638,7 @@ trend = if_else(total_chl_table$p.value >= 0.05, true = "No trend", false = if_e
 plot_title = glue("Total Chlorophyll (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
-label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
+#label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R^2 = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 
 
@@ -662,11 +659,10 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
   labs(title = plot_title, x = "Year", y = "Total Chlorophyll (µg/L)",caption=label2)+
   scale_x_continuous(labels=scales::number_format(accuracy=1))+
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
-    label = label
-    ,x = (min(Lake_2$Year,na.rm = TRUE)+5),
-    y = (max(Lake_2$CHL, na.rm = TRUE)+5),
-    )+ylim(minlim, maxlim)
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  #geom_richtext(label = label,x = (min(Lake_2$Year,na.rm = TRUE)+5),
+  #              y = (max(Lake_2$CHL, na.rm = TRUE)+5),)+
+  ylim(minlim, maxlim)
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
@@ -693,7 +689,7 @@ trend = if_else(total_secchi_table$p.value >= 0.05, true = "No trend", false = i
 plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
 
-label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
+#label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R^2 = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 
 maxlim = max(Lake_2$SECCHI_ft, na.rm = TRUE)+10
@@ -713,11 +709,10 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
   labs(title = plot_title, x = "Year", y = "Secchi depth (ft)",caption=label2)+
   scale_x_continuous(labels=scales::number_format(accuracy=1))+
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) + geom_richtext(
-    label = label,
-    x = (min(Lake_2$Year, na.rm = TRUE)+5),
-    y = (max(Lake_2$SECCHI_ft, na.rm = TRUE)+5)
-    )+ylim(minlim, maxlim)
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  #geom_richtext(label = label,x = (min(Lake_2$Year, na.rm = TRUE)+5),
+  #              y = (max(Lake_2$SECCHI_ft, na.rm = TRUE)+5))+
+  ylim(minlim, maxlim)
   
 
 
