@@ -165,6 +165,7 @@ tbl2df <- data.frame(rowname, mins, maxs, ggmean, n)
 tbl2df[tbl2df == "NaN"] <- " "
 tbl2df[tbl2df == "NA"] <- " "
 tbl2df[tbl2df == "Inf"] <- " "
+tbl2df[tbl2df == "-Inf"] <- " "
 
 table_two <- gt(data = tbl2df) %>% 
   fmt_number(
