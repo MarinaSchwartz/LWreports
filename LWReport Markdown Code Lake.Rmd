@@ -124,9 +124,7 @@ b.  If there are insufficient data to calculate the annual geometric mean chloro
 -   **Lake Classification:** Numeric nutrient criteria for Florida require that lakes must first be classified into one of three group based on color and alkalinity or specific conductance; **colored lakes** (color greater than 40 Pt-Co units), **clear soft water lakes** (color less than or equal to 40 Pt-Co units and alkalinity less than or equal to 20 mg/L as CaCO3 or specific conductance less than or equal to 100 µs/cm @25 C), and **clear hard water lakes** (color less than 40 Pt-Co units and alkalinity greater than 20 mg/L as CaCO3 or specific conductance greater 100 µS/cm \@ 25 C).
 
 ### Table 1. Florida Department of Environmental Protection's Numeric Nutrient Criteria for lakes.
-
-```{r table_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
-
+```{r table_one_image, echo=FALSE, out.width= "450px", fig.align='center',}
 knitr::include_graphics("LW Reports Table 1 V.2.png")
 
 
@@ -168,13 +166,13 @@ tbl2df[tbl2df == "NaN"] <- " "
 tbl2df[tbl2df == "NA"] <- " "
 tbl2df[tbl2df == "Inf"] <- " "
 
-table_two <- gt(data = tbl2df) %>% fmt_number(
+table_two <- gt(data = tbl2df) %>% 
+  fmt_number(
   columns = c(mins, maxs, ggmean),
   decimals = 1) %>%
   tab_options(column_labels.hidden = TRUE) %>%
-  opt_table_font(
-  stack = "transitional"
-) %>%
+  opt_table_font(stack = "transitional")  %>%
+  
 tab_style(
     style =
       cell_text(weight = "bold"),
@@ -217,6 +215,7 @@ gtsave(table_two, filename = "table_2.png", path = "Lake/output_table")
 knitr::include_graphics("Lake/output_table/table_2.png")
 ```
 
+\newpage
 **Interpreting FDEP’s Numeric Nutrient Criteria (NNC): These are instructions for using Table 1 and 2 to determine impairment status based on FDEP’s NNC.**
 
 1.  Identify your lake’s *Lake Classification* in Table 2 (Colored, Clear Hard Water, or Clear Soft Water) (if no classification is listed then there is not enough data available to classify your lake).
@@ -551,7 +550,7 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
     x = (min(Lake_2$Year, na.rm = TRUE)+5),
     y = (max(Lake_2$TP, na.rm = TRUE)+5))+
   ylim(minlim, maxlim)
-
+ 
 #+xlim() maybe for axis whole numbers?
 
 
