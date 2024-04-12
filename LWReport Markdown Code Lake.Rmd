@@ -545,8 +545,7 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
   labs(title = plot_title, x = "Year", y = "Total Phosphorus (µg/L)",caption=paste0(label2))+
   scale_x_continuous(labels=scales::number_format(accuracy=1))+
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5),
-        plot.margin=margin(b=20)) + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
   #geom_richtext(label = label,x = (min(Lake_2$Year, na.rm = TRUE)+5),
   #              y=(max(Lake_2$TP, na.rm = TRUE)+5))+
   ylim(minlim, maxlim)
