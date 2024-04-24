@@ -6,9 +6,6 @@ params:
   Lakes: 0
 ---
 
-```{r tinytex update, include=FALSE}
-tinytex::tlmgr_update()
-```
 
 ```{r document option, include=FALSE}
 

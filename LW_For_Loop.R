@@ -27,7 +27,7 @@ data_1 = read_xlsx("Lakewatch Base File RMD.xlsx")
 data_1 <- data_1 %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Sarasota") %>%
+  filter(County == "Collier") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary") 
 head(data_1)
 
@@ -43,17 +43,18 @@ head(data_2)
 data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
 head(data_all)
 
-Lakes = unique(data_1$Lake_County)
-#Lakes = c("Quarry Collier") #run previous line OR this line -EDM
+#Lakes = unique(data_1$Lake_County)
+Lakes = c("Quarry Collier","Swan Collier")
 print(Lakes)
 
-n = 1
-N = length(Lakes)
+n_count = 1
+N_count = length(Lakes)
 
 
 ### for loop with counter ###
 
 for(l in Lakes){
+  
  #subsets data for lake of interest
   
   Lake_1 <- data_1 %>%
@@ -111,8 +112,8 @@ for(l in Lakes){
  
  #counter
   print(Lake_2$Lake_County[1])
- # print(paste(n, "/", N))
- # n <- n+1
+  print(paste(n_count, "/", N_count))
+  n_count <- n_count+1
 }
 
 
