@@ -117,7 +117,7 @@ For decades Florida has had a narrative nutrient water quality criterion in plac
 
 ```{r Figure_one_image, echo=FALSE, out.width= "400px", fig.align='center',}
 
-knitr::include_graphics("Figure 1 RiverStream.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Images/Figure 1 RiverStream.png")
 
 ```
 
@@ -125,7 +125,7 @@ knitr::include_graphics("Figure 1 RiverStream.png")
 
 ```{r table_one_image, echo=FALSE, out.width= "500px", fig.align='center',}
 
-knitr::include_graphics("Table 1 RiverStream.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Images/Table 1 RiverStream.png")
 ```
 
 
@@ -175,12 +175,12 @@ table_two = gt(tbl2df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_numb
 ) %>% tab_header(title = md("**Table 2.** Base File Data.")
   )  
 
-gtsave(table_two, filename = "table_2.png", path = "RiverStream/output_table")
+gtsave(table_two, filename = "table_2.png", path = "~/Documents/GitHub/LWreports/Output/RiverStream/output_table")
 
 ```
 
 ```{r table 2, out.width= "500px", fig.align='center'}
-knitr::include_graphics("RiverStream/output_table/table_2.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_table/table_2.png")
 ```
 
 
@@ -274,13 +274,13 @@ tab_style(
 
 #amber figured this out. if we knit using gttable to pdf we get massive issues. this is because GTtable does not support kniting to pdf. if we save as a png file, knitr can knit this png file to the document just fine.
 
-gtsave(table_three, filename = "table_3.png", path = "RiverStream/output_table")
+gtsave(table_three, filename = "table_3.png", path = "~/Documents/GitHub/LWreports/Output/RiverStream/output_table")
 
 
 ```
 
 ```{r table 3, out.width= "500px", fig.align='center'}
-knitr::include_graphics("RiverStream/output_table/table_3.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_table/table_3.png")
 ```
 
 \newpage
@@ -440,13 +440,13 @@ total_p_graph = ggplot(data = Lake_2, aes(x = Year, y = TP)) +
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
-ggsave("Lake/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_p_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 ```
 
 ```{r total p_graph out, out.width= "400px",fig.align = "center"}
 if(tp_n$n >= 5){
-knitr::include_graphics("Lake/output_graphs/total_p_graph.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_p_graph.png")
 }
 ```
 
@@ -493,13 +493,13 @@ total_n_graph = ggplot(data = Lake_2, aes(x = Year, y = TN)) +
 #show(total_n_graph)
 ##commented out so the graph does not show up twice.
 
-ggsave("Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 ```
 
 ```{r total n_graph out, out.width= "400px",fig.align = "center"}
 if(tn_n$n >= 5){
-knitr::include_graphics("Lake/output_graphs/total_n_graph.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_n_graph.png")
 }
 ```
 \newpage
@@ -547,13 +547,13 @@ total_chl_graph = ggplot(data = Lake_2, aes(x = Year, y = CHL)) +
 
 #show(total_chl_graph)
 ##commented out so the graph does not show up twice.
-ggsave("Lake/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 ```
 
 ```{r chl_graph out, out.width= "400px",fig.align = "center"}
 if(chl_n$n >= 5){
-knitr::include_graphics("Lake/output_graphs/total_chl_graph.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_chl_graph.png")
 }
 ```
 
@@ -599,13 +599,13 @@ total_secchi_graph = ggplot(data = Lake_2, aes(x = Year, y = SECCHI_ft)) +
 
 #show(total_secchi_graph)
 ###commented out so the graph does not show up twice.
-ggsave("Lake/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
+ggsave("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 
 ```
 
 ```{r secchi_graph out, out.width= "400px",fig.align = "center"}
 if(secchi_m_n$n >= 5){
-knitr::include_graphics("Lake/output_graphs/total_secchi_graph.png")
+knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_graphs/total_secchi_graph.png")
 }
 ```

@@ -55,7 +55,7 @@ head(data_all)
 
 #Run ONE of these two lines
 #Lakes = unique(data_1$Lake_County)
-Lakes = c("Quarry Collier","Swan Collier")
+Lakes = c("Quarry Collier")
 
 print(Lakes)
 
