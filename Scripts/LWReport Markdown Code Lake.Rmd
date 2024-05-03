@@ -506,7 +506,7 @@ data_combined = full_join(data_combined,data_n, by = "parameter")
 
 ```{r p_graph}
 
-###TP Graph----
+### Graphs ----
 
 if(tp_n$n >= 5){
   
@@ -530,10 +530,12 @@ trend = if_else(
     false = "Decreasing"))
  
 
+#label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
+label2 = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R^2 = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
+
 maxlim = max(Lake_2$TP)+10
 minlim = min(Lake_2$TP)
-
-
+  
 total_p_graph <- ggplot(data = Lake_2_bymo_TP, aes(x = Year, y = gmean.TP)) +
   geom_point() +
   geom_smooth(
@@ -543,14 +545,15 @@ total_p_graph <- ggplot(data = Lake_2_bymo_TP, aes(x = Year, y = gmean.TP)) +
     alpha=0.15,
     linetype = paste(if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" ))) +
   labs(title = plot_title, x = "Year", y = "Total Phosphorus (µg/L)",caption=paste0(label2))+
-  scale_x_continuous(labels=scales::number_format(accuracy=1))+
+  scale_x_continuous(breaks = seq(min(Lake_2_bymo_TP$Year), 
+    max(Lake_2_bymo_TP$Year), by = 2),
+    labels=scales::number_format(accuracy=1))+
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.TP-SD.TP, ymax=gmean.TP+SD.TP), width=.2, position=position_dodge(.9)) +
   ylim(minlim, maxlim)
- 
-#label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
-label2 = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R^2 = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
+
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
@@ -566,11 +569,15 @@ knitr::include_graphics("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/
 ```
 
 ```{r n_graph}
+
 #TN Graph 
+
 if(tn_n$n >= 5){
   
-  Lake_2_bymo_TN = Lake_2 %>%
-  group_by(Year, na.rm=TRUE)%>%
+plot_title = glue("Total Nitrogen (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
+
+Lake_2_bymo_TN = Lake_2 %>%
+group_by(Year, na.rm=TRUE)%>%
 dplyr::summarise(gmean.TN = gmean(TN), na.rm=TRUE, SD.TN = sd(TN, na.rm=TRUE))
   
   
@@ -578,20 +585,20 @@ total_n_lm = lm(gmean.TN ~ Year, data = Lake_2_bymo_TN)
 
 total_n_table = glance(total_n_lm)
 
-trend = if_else(total_n_table$p.value >= 0.05, true = "No trend", false = if_else(total_n_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
-  
-plot_title = glue("Total Nitrogen (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
-  
+trend = if_else(
+  total_n_table$p.value >= 0.05,
+  true = "No trend",
+  false = if_else(
+    total_n_lm[["coefficients"]][["Year"]] > 0 ,
+    true = "Increasing",
+    false = "Decreasing"))
 
 #label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R^2 = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 
-
 maxlim = max(Lake_2$TN)+10
 minlim = min(Lake_2$TN)
-
-
-
+  
 total_n_graph = ggplot(data = Lake_2_bymo_TN, aes(x = Year, y = gmean.TN)) +
   geom_point() +
   geom_smooth(
@@ -599,22 +606,18 @@ total_n_graph = ggplot(data = Lake_2_bymo_TN, aes(x = Year, y = gmean.TN)) +
     se = TRUE, 
     color = "darkgoldenrod2",
     alpha=0.15,
-    linetype = paste(
-      if_else(total_n_table$p.value <= 0.05,true = "solid", false = "dashed" )
-      )
-    ) +
+    linetype = paste(if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" ))) +
   labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)",caption=paste0(label2))+
-  scale_x_continuous(labels=scales::number_format(accuracy=1))+
+  scale_x_continuous(breaks = seq(min(Lake_2_bymo_TN$Year), 
+    max(Lake_2_bymo_TN$Year), by = 2),
+    labels=scales::number_format(accuracy=1))+
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.TN-SD.TN, ymax=gmean.TN+SD.TN), width=.2, position=position_dodge(.9)) +
-  #geom_richtext(label = label,x = (min(Lake_2$Year, na.rm = TRUE)+5),
-  #              y =(max(Lake_2$TN, na.rm = TRUE)+5),)+
   ylim(minlim, maxlim)
 
 
-#show(total_n_graph)
-##commented out so the graph does not show up twice.
 
 ggsave("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
@@ -630,32 +633,37 @@ knitr::include_graphics("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/
 **Figure 4 and Figure 5. Trend plots of total phosphorus and total nitrogen versus year. The R^2^ value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots as Increasing, Decreasing, or No Trend.**
 
 ```{r chl_graph}
-#chl Graph
+#CHL Graph
+
 if(chl_n$n >= 5){
   
-  Lake_2_bymo_CHL = Lake_2 %>%
-  select(-Station)%>%
-   group_by(Year, na.rm=TRUE)%>%
+plot_title = glue("Total Chlorophyll (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
+  
+Lake_2_bymo_CHL = Lake_2 %>%
+select(-Station)%>%
+group_by(Year, na.rm=TRUE)%>%
 dplyr::summarise(gmean.CHL = gmean(CHL), na.rm=TRUE, SD.CHL = sd(CHL, na.rm=TRUE))
+
   
 total_chl_lm = lm(gmean.CHL ~ Year, data = Lake_2_bymo_CHL)
 
 total_chl_table = glance(total_chl_lm)
 
-trend = if_else(total_chl_table$p.value >= 0.05, true = "No trend", false = if_else(total_chl_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
-  
-plot_title = glue("Total Chlorophyll (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
-  
+trend = if_else(
+  total_chl_table$p.value >= 0.05,
+  true = "No trend",
+  false = if_else(
+    total_chl_lm[["coefficients"]][["Year"]] > 0 ,
+    true = "Increasing",
+    false = "Decreasing")) 
+
 
 #label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R^2 = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 
-
 maxlim = max(Lake_2$CHL)+10
 minlim = min(Lake_2$CHL)
-
-
-
+  
 total_chl_graph = ggplot(data = Lake_2_bymo_CHL, aes(x = Year, y = gmean.CHL)) +
   geom_point() +
   geom_smooth(
@@ -668,16 +676,17 @@ total_chl_graph = ggplot(data = Lake_2_bymo_CHL, aes(x = Year, y = gmean.CHL)) +
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Total Chlorophyll (µg/L)",caption=label2)+
-  scale_x_continuous(labels=scales::number_format(accuracy=1))+
+  scale_x_continuous(breaks = seq(min(Lake_2_bymo_CHL$Year), 
+    max(Lake_2_bymo_CHL$Year), by = 2),
+    labels=scales::number_format(accuracy=1))+
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.CHL-SD.CHL, ymax=gmean.CHL+SD.CHL), width=.2, position=position_dodge(.9)) +
-  #geom_richtext(label = label,x = (min(Lake_2$Year,na.rm = TRUE)+5),
-  #              y = (max(Lake_2$CHL, na.rm = TRUE)+5),)+
   ylim(minlim, maxlim)
 
-#show(total_chl_graph)
-##commented out so the graph does not show up twice.
+
+
 ggsave("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 ```
@@ -689,29 +698,35 @@ knitr::include_graphics("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/
 ```
 
 ```{r secchi_graph}
+
 #Secchi Graph
+
 if(secchi_m_n$n >= 5){
+
+plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County") 
   
-  Lake_2_bymo_SECCHI_ft = Lake_2 %>%
-  group_by(Year, na.rm=TRUE)%>%
-  dplyr::summarise(gmean.SECCHI_ft = gmean(SECCHI_ft), na.rm=TRUE, SD.SECCHI_ft = sd(SECCHI_ft, na.rm=TRUE))
+Lake_2_bymo_SECCHI_ft = Lake_2 %>%
+group_by(Year, na.rm=TRUE)%>%
+dplyr::summarise(gmean.SECCHI_ft = gmean(SECCHI_ft), na.rm=TRUE, SD.SECCHI_ft = sd(SECCHI_ft, na.rm=TRUE))
   
 total_secchi_lm = lm(gmean.SECCHI_ft ~ Year, data = Lake_2_bymo_SECCHI_ft)
 
 total_secchi_table = glance(total_secchi_lm)
 
-trend = if_else(total_secchi_table$p.value >= 0.05, true = "No trend", false = if_else(total_secchi_lm[["coefficients"]][["Year"]] > 0 , true = "Increasing", false = "Decreasing"))
+trend = if_else(
+  total_chl_table$p.value >= 0.05,
+  true = "No trend",
+  false = if_else(
+    total_chl_lm[["coefficients"]][["Year"]] > 0 ,
+    true = "Increasing",
+    false = "Decreasing"))  
+ 
   
-plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
-  
-
 #label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R^2 = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 
 maxlim = max(Lake_2$SECCHI_ft, na.rm = TRUE)+10
 minlim = min(Lake_2$SECCHI_ft, na.rm = TRUE)
-
-
 
 total_secchi_graph = ggplot(data = Lake_2_bymo_SECCHI_ft, aes(x = Year, y = gmean.SECCHI_ft)) +
   geom_point() +
@@ -725,18 +740,17 @@ total_secchi_graph = ggplot(data = Lake_2_bymo_SECCHI_ft, aes(x = Year, y = gmea
       )
     ) +
   labs(title = plot_title, x = "Year", y = "Secchi depth (ft)",caption=label2)+
-  scale_x_continuous(labels=scales::number_format(accuracy=1))+
+  scale_x_continuous(breaks = seq(min(Lake_2_bymo_SECCHI_ft$Year), 
+    max(Lake_2_bymo_SECCHI_ft$Year), by = 2),
+    labels=scales::number_format(accuracy=1))+
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.SECCHI_ft-SD.SECCHI_ft, ymax=gmean.SECCHI_ft+SD.SECCHI_ft), width=.2, position=position_dodge(.9)) +
-  #geom_richtext(label = label,x = (min(Lake_2$Year, na.rm = TRUE)+5),
-  #              y = (max(Lake_2$SECCHI_ft, na.rm = TRUE)+5))+
   ylim(minlim, maxlim)
   
 
 
-#show(total_secchi_graph)
-###commented out so the graph does not show up twice.
 ggsave("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/total_secchi_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 
