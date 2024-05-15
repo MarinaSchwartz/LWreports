@@ -606,7 +606,7 @@ total_n_graph = ggplot(data = Lake_2_bymo_TN, aes(x = Year, y = gmean.TN)) +
     se = TRUE, 
     color = "darkgoldenrod2",
     alpha=0.15,
-    linetype = paste(if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" ))) +
+    linetype = paste(if_else(total_n_table$p.value <= 0.05,true = "solid", false = "dashed" ))) +
   labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)",caption=paste0(label2))+
   scale_x_continuous(breaks = seq(min(Lake_2_bymo_TN$Year), 
     max(Lake_2_bymo_TN$Year), by = 2),
