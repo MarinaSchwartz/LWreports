@@ -508,16 +508,25 @@ data_combined = full_join(data_combined,data_n, by = "parameter")
 
 ### Graphs ----
 
+
 if(tp_n$n >= 5){
   
 plot_title = glue("Total Phosphorus (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")
 
-Lake_2_bymo_TP = Lake_2 %>%
+Lake_2_rando_TP = Lake_2 %>%
+ mutate(TP = ifelse(TP <6, runif(n(), min = 0, max = 6), TP)) 
+
+
+Lake_2_bymo_TP = Lake_2_rando_TP %>%
 group_by(Year, na.rm=TRUE)%>%
 dplyr::summarise(gmean.TP = gmean(TP), na.rm=TRUE, SD.TP = sd(TP, na.rm=TRUE))
-
+Lake_2_bymo_TP$ymax = Lake_2_bymo_TP$gmean.TP+Lake_2_bymo_TP$SD.TP  
+Lake_2_bymo_TP$ymin = Lake_2_bymo_TP$gmean.TP-Lake_2_bymo_TP$SD.TP
   
 total_p_lm = lm(gmean.TP ~ Year, data = Lake_2_bymo_TP)
+
+maxlim = max(Lake_2_bymo_TP$ymax, na.rm = TRUE)
+minlim = min(Lake_2_bymo_TP$ymin, na.rm = TRUE)
 
 total_p_table = glance(total_p_lm)
 
@@ -533,9 +542,6 @@ trend = if_else(
 #label = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_p_table$p.value, digits = 2)}, R^2 = {signif(total_p_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake_2$TP)+10
-minlim = min(Lake_2$TP)
-  
 total_p_graph <- ggplot(data = Lake_2_bymo_TP, aes(x = Year, y = gmean.TP)) +
   geom_point() +
   geom_smooth(
@@ -553,7 +559,6 @@ total_p_graph <- ggplot(data = Lake_2_bymo_TP, aes(x = Year, y = gmean.TP)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.TP-SD.TP, ymax=gmean.TP+SD.TP), width=.2, position=position_dodge(.9)) +
   ylim(minlim, maxlim)
-
 
 
 #we decided to save as a png file due to issues with knitr rendering the graph when knitting. it seems to understand how to knit a png file more consistently. 
@@ -576,12 +581,20 @@ if(tn_n$n >= 5){
   
 plot_title = glue("Total Nitrogen (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
 
-Lake_2_bymo_TN = Lake_2 %>%
+Lake_2_rando_TN = Lake_2 %>%
+ mutate(TN = ifelse(TN <20, runif(n(), min = 0, max = 20), TN)) 
+
+
+Lake_2_bymo_TN = Lake_2_rando_TN %>%
 group_by(Year, na.rm=TRUE)%>%
 dplyr::summarise(gmean.TN = gmean(TN), na.rm=TRUE, SD.TN = sd(TN, na.rm=TRUE))
-  
-  
+Lake_2_bymo_TN$ymax = Lake_2_bymo_TN$gmean.TN+Lake_2_bymo_TN$SD.TN  
+Lake_2_bymo_TN$ymin = Lake_2_bymo_TN$gmean.TN-Lake_2_bymo_TN$SD.TN 
+
 total_n_lm = lm(gmean.TN ~ Year, data = Lake_2_bymo_TN)
+
+maxlim = max(Lake_2_bymo_TN$ymax, na.rm = TRUE)
+minlim = min(Lake_2_bymo_TN$ymin, na.rm = TRUE)
 
 total_n_table = glance(total_n_lm)
 
@@ -596,9 +609,6 @@ trend = if_else(
 #label = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_n_table$p.value, digits = 2)}, R^2 = {signif(total_n_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake_2$TN)+10
-minlim = min(Lake_2$TN)
-  
 total_n_graph = ggplot(data = Lake_2_bymo_TN, aes(x = Year, y = gmean.TN)) +
   geom_point() +
   geom_smooth(
@@ -606,7 +616,7 @@ total_n_graph = ggplot(data = Lake_2_bymo_TN, aes(x = Year, y = gmean.TN)) +
     se = TRUE, 
     color = "darkgoldenrod2",
     alpha=0.15,
-    linetype = paste(if_else(total_n_table$p.value <= 0.05,true = "solid", false = "dashed" ))) +
+    linetype = paste(if_else(total_p_table$p.value <= 0.05,true = "solid", false = "dashed" ))) +
   labs(title = plot_title, x = "Year", y = "Total Nitrogen (µg/L)",caption=paste0(label2))+
   scale_x_continuous(breaks = seq(min(Lake_2_bymo_TN$Year), 
     max(Lake_2_bymo_TN$Year), by = 2),
@@ -616,8 +626,7 @@ total_n_graph = ggplot(data = Lake_2_bymo_TN, aes(x = Year, y = gmean.TN)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.TN-SD.TN, ymax=gmean.TN+SD.TN), width=.2, position=position_dodge(.9)) +
   ylim(minlim, maxlim)
-
-
+ 
 
 ggsave("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/total_n_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
@@ -639,14 +648,23 @@ if(chl_n$n >= 5){
   
 plot_title = glue("Total Chlorophyll (µg/L) by Year for {Lake_2$Lake[1]} in {Lake_2$County[1]} County")  
   
-Lake_2_bymo_CHL = Lake_2 %>%
+
+Lake_2_rando_CHL = Lake_2 %>%
+ mutate(CHL = ifelse(CHL <1, runif(n()), CHL)) 
+
+
+Lake_2_bymo_CHL = Lake_2_rando_CHL %>%
 select(-Station)%>%
 group_by(Year, na.rm=TRUE)%>%
 dplyr::summarise(gmean.CHL = gmean(CHL), na.rm=TRUE, SD.CHL = sd(CHL, na.rm=TRUE))
-
+Lake_2_bymo_CHL$ymax = Lake_2_bymo_CHL$gmean.CHL+Lake_2_bymo_CHL$SD.CHL
+Lake_2_bymo_CHL$ymin = Lake_2_bymo_CHL$gmean.CHL-Lake_2_bymo_CHL$SD.CHL
   
 total_chl_lm = lm(gmean.CHL ~ Year, data = Lake_2_bymo_CHL)
 
+maxlim = max(Lake_2_bymo_CHL$ymax, na.rm = TRUE)
+minlim = min(Lake_2_bymo_CHL$ymin, na.rm = TRUE)
+  
 total_chl_table = glance(total_chl_lm)
 
 trend = if_else(
@@ -661,8 +679,6 @@ trend = if_else(
 #label = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_chl_table$p.value, digits = 2)}, R^2 = {signif(total_chl_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake_2$CHL)+10
-minlim = min(Lake_2$CHL)
   
 total_chl_graph = ggplot(data = Lake_2_bymo_CHL, aes(x = Year, y = gmean.CHL)) +
   geom_point() +
@@ -684,6 +700,7 @@ total_chl_graph = ggplot(data = Lake_2_bymo_CHL, aes(x = Year, y = gmean.CHL)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
   geom_errorbar(aes(ymin=gmean.CHL-SD.CHL, ymax=gmean.CHL+SD.CHL), width=.2, position=position_dodge(.9)) +
   ylim(minlim, maxlim)
+  
 
 
 
@@ -708,9 +725,14 @@ plot_title = glue("Secchi Depth (ft) by Year for {Lake_2$Lake[1]} in {Lake_2$Cou
 Lake_2_bymo_SECCHI_ft = Lake_2 %>%
 group_by(Year, na.rm=TRUE)%>%
 dplyr::summarise(gmean.SECCHI_ft = gmean(SECCHI_ft), na.rm=TRUE, SD.SECCHI_ft = sd(SECCHI_ft, na.rm=TRUE))
-  
+Lake_2_bymo_SECCHI_ft$ymax = Lake_2_bymo_SECCHI_ft$gmean.SECCHI_ft+Lake_2_bymo_SECCHI_ft$SD.SECCHI_ft
+Lake_2_bymo_SECCHI_ft$ymin = Lake_2_bymo_SECCHI_ft$gmean.SECCHI_ft-Lake_2_bymo_SECCHI_ft$SD.SECCHI_ft  
+
 total_secchi_lm = lm(gmean.SECCHI_ft ~ Year, data = Lake_2_bymo_SECCHI_ft)
 
+maxlim = max(Lake_2_bymo_SECCHI_ft$ymax, na.rm = TRUE)
+minlim = min(Lake_2_bymo_SECCHI_ft$ymin, na.rm = TRUE)
+  
 total_secchi_table = glance(total_secchi_lm)
 
 trend = if_else(
@@ -725,8 +747,6 @@ trend = if_else(
 #label = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R<sup>2</sup> = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 label2 = (glue("p = {signif(total_secchi_table$p.value, digits = 2)}, R^2 = {signif(total_secchi_table$r.squared, digits = 2)}, {trend} "))
 
-maxlim = max(Lake_2$SECCHI_ft, na.rm = TRUE)+10
-minlim = min(Lake_2$SECCHI_ft, na.rm = TRUE)
 
 total_secchi_graph = ggplot(data = Lake_2_bymo_SECCHI_ft, aes(x = Year, y = gmean.SECCHI_ft)) +
   geom_point() +

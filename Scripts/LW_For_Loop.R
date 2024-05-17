@@ -37,7 +37,7 @@ gmean <- function(x){
 data_1 <- data_1 %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Sarasota") %>%
+  filter(County == "Charlotte") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary") 
 head(data_1)
 
@@ -55,9 +55,15 @@ head(data_all)
 
 #Run ONE of these two lines
 Lakes = unique(data_1$Lake_County)
-#Lakes = c("Walsingham Pinellas",
-#"Westchester Pinellas",
-#"Winston Pinellas")
+#Lakes = c("Cudjoe-9 Monroe")
+         #  ,
+         #  "Grand Haven 12 Flagler",
+         #  "Grand Haven 13 Flagler",
+         #  "Grand Haven 18A Flagler",
+         #  "Grand Haven 28 Flagler",
+         #  "Grand Haven 4 Flagler",
+         #  "Grand Haven 5 Flagler",
+         # "Grand Haven W6 Flagler")
 
 print(Lakes)
 
