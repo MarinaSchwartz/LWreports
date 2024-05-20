@@ -54,8 +54,8 @@ head(data_all)
 ### for loop with counter ----
 
 #Run ONE of these two lines
-Lakes = unique(data_1$Lake_County)
-#Lakes = c("Cudjoe-9 Monroe")
+#Lakes = unique(data_1$Lake_County)
+Lakes = c("White Marsh Weir Charlotte")
          #  ,
          #  "Grand Haven 12 Flagler",
          #  "Grand Haven 13 Flagler",
