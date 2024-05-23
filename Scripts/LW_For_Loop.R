@@ -37,7 +37,7 @@ gmean <- function(x){
 data_1 <- data_1 %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Charlotte") %>%
+  filter(County == "Seminole") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary") 
 head(data_1)
 
@@ -54,10 +54,9 @@ head(data_all)
 ### for loop with counter ----
 
 #Run ONE of these two lines
-#Lakes = unique(data_1$Lake_County)
-Lakes = c("White Marsh Weir Charlotte")
-         #  ,
-         #  "Grand Haven 12 Flagler",
+Lakes = unique(data_1$Lake_County)
+#Lakes = c("WF-1 Charlotte")
+         #  "Casa de Meadows Charlotte",
          #  "Grand Haven 13 Flagler",
          #  "Grand Haven 18A Flagler",
          #  "Grand Haven 28 Flagler",

@@ -619,7 +619,7 @@ trend = if_else(
   total_secchi_table$p.value >= 0.05,
   true = "No trend",
   false = if_else(
-    total_chl_lm[["coefficients"]][["Year"]] > 0 ,
+    total_secchi_lm[["coefficients"]][["Year"]] > 0 ,
     true = "Increasing",
     false = "Decreasing"))  
  
