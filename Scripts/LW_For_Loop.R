@@ -37,8 +37,8 @@ gmean <- function(x){
 data_1 <- data_1 %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Seminole") %>%
-  filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary") 
+  filter(County == "Okaloosa") %>%
+  filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary"| `water type` == "Spring Boil"| `water type` == "Spring Run"| `water type` == "Dune Lake") 
 head(data_1)
 
 
@@ -55,9 +55,9 @@ head(data_all)
 
 #Run ONE of these two lines
 Lakes = unique(data_1$Lake_County)
-#Lakes = c("WF-1 Charlotte")
-         #  "Casa de Meadows Charlotte",
-         #  "Grand Haven 13 Flagler",
+# Lakes = c("Miami Springs-1 Seminole",
+#           "Miami Springs-2 Seminole",
+#           "Miami Springs-3 Seminole")
          #  "Grand Haven 18A Flagler",
          #  "Grand Haven 28 Flagler",
          #  "Grand Haven 4 Flagler",
@@ -102,6 +102,14 @@ for(l in Lakes){
                         output_dir = "Output/Lake",                       # 4. Define an output folder/directory
                         params = list(Lakes = l))  }
     
+    if(Lake_1$`water type`[1] == "Dune Lake") {
+      
+      
+      rmarkdown::render(input = "Scripts/LWReport Markdown Code Lake.Rmd", output_format = "pdf_document",         # 2. Establish the format
+                        output_file = paste0(l ,"_report.pdf"), # 3. Define the output file name
+                        output_dir = "Output/Lake",                       # 4. Define an output folder/directory
+                        params = list(Lakes = l))  }
+    
     if(Lake_1$`water type`[1] == "Estuary") {
       
       
@@ -117,9 +125,25 @@ for(l in Lakes){
                         output_file = paste0(l ,"_report.pdf"), # 3. Define the output file name
                         output_dir = "Output/RiverStream",                       # 4. Define an output folder/directory
                         params = list(Lakes = l))  }
-
+    
+    if(Lake_1$`water type`[1] == "Spring Boil") {
+      
+      
+      rmarkdown::render(input = "Scripts/LWReport Markdown Code RiverStream.Rmd", output_format = "pdf_document",         # 2. Establish the format
+                        output_file = paste0(l ,"_report.pdf"), # 3. Define the output file name
+                        output_dir = "Output/RiverStream",                       # 4. Define an output folder/directory
+                        params = list(Lakes = l))  }
   
  
+    if(Lake_1$`water type`[1] == "Spring Run") {
+      
+      
+      rmarkdown::render(input = "Scripts/LWReport Markdown Code RiverStream.Rmd", output_format = "pdf_document",         # 2. Establish the format
+                        output_file = paste0(l ,"_report.pdf"), # 3. Define the output file name
+                        output_dir = "Output/RiverStream",                       # 4. Define an output folder/directory
+                        params = list(Lakes = l))  }
+    
+    
  #counter
   print(Lake_2$Lake_County[1])
   print(paste(n_count, "/", N_count))

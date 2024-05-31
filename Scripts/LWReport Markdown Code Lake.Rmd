@@ -268,7 +268,7 @@ maxs = c("Maximum Annual Geometric Mean", max(byyr$`gmean(TP)`), max(byyr$`gmean
 ggmean = c("Grand Geometric Mean", gmean(byyr$`gmean(TP)`), gmean(byyr$`gmean(TN)`), gmean(byyr$`gmean(CHL)`), gmean(byyr$`gmean(SECCHI_ft)`), gmean(.3*byyr$`gmean(SECCHI_ft)`), gmean(byyr$`gmean(Color)`), gmean(byyr$`gmean(Cond_uS)`), "NA") 
 ####End Ambers Code####
 
-### TABLE 3 CODE ### MS EDITS 4-10
+### TABLE 3 CODE ### 
 
 
 #geometric means by year
@@ -297,9 +297,10 @@ lts <- ifelse(tsi < 40 , "Oligotrophic",
               (ifelse(tsi < 50 , "Mesotrophic",
                (ifelse(tsi < 70, "Eutrophic", "Hypereutrophic")))))  #lake trophic status
 tpz <- Lake_1$`TP Zone`[1] #tp zone
-gtp <- paste(ggtp, "(", min(byyr$`gmean(TP)`), " to ", max(byyr$`gmean(TP)`) , ")" ) #grand total phosphorous
+
+gtp <- paste(ggtp, "(", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), " to ", max(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]) , ")" ) #grand total phosphorous
 tnz <- Lake_1$`TN Zone`[1]
-gtn <- paste(ggtn, "(", min(byyr$`gmean(TN)`), " to ", max(byyr$`gmean(TN)`), ")") #grand tn geomean
+gtn <- paste(ggtn, "(", min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`)== FALSE]), " to ", max(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`)== FALSE]) , ")" )  #grand tn geomean
 gnis <- Lake_1$GNIS_ID[1]
 lat <- round(Lake_1$Latitude[1], 4)
 long <- round(Lake_1$Longitude[1], 4)
@@ -328,7 +329,9 @@ rowname <- c("County", "Name", "GNIS Number", "Latitude", "Longitude", "Water Bo
 
 #make dataframe with rownames and row values
 tbl3df <- data.frame(rowname, rowval)
-#make gt table
+
+
+
 table_three = gt(tbl3df) %>% tab_options(column_labels.hidden = TRUE) %>% fmt_number(
   decimals = 4,drop_trailing_zeros = TRUE,
 ) %>% opt_table_font(
