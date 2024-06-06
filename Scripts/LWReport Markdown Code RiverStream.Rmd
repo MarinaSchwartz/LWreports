@@ -30,45 +30,7 @@ options(gt.html_tag_check = FALSE)
 ```
 
 ```{r data_processing,  eval=TRUE}
-###IMPORTING LIBRARIES AND LOADING DATA###
-##########################################################################################
-#Commenting out this code to add to the for loop file
-#importing libraries 
-#library(tidyverse)
-#library(gt)
-#library(SciViews)
-#library(broom)
-#broom is just to get values form lm function in easier to reference from
-library(glue)
-#library(ggtext)
-#glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
-#library(readxl)
 
-### Loading and Preparing Data
-
-# path <- "C:/Users/amber.riner/Documents/LWreports"
-# setwd(path)
-# 
-# data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
-# data_1 <- data_1 %>%
-#   mutate(Lake_County = paste(Lake, County)) %>%
-#   filter(Study == "LW") %>%
-#   filter(`water type` == "Lake") 
-# head(data_1)
-# 
-# data_2 = read.csv("All_Data.csv")
-# data_2 = data_2 %>%
-#   mutate(Station = as.character(Station)) %>%
-#   mutate(Lake_County = paste(Lake, County)) 
-# head(data_2)
-# 
-# data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
-# 
-# Lake = data_all %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
-
-##################################################################################
-
-###FUNCTIONS###
 
 #calculates geometric mean
 gmean <- function(x){
@@ -78,19 +40,9 @@ gmean <- function(x){
   return(xg)
 } 
 
-#adding a column using if/else for lake classification
-##this code currently has no fallback for if the data is missing.
-#Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
-  #gmean(`Color`) > 40, "Colored", ifelse(
-  #  gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
 
-#adding a column using if/else for trophic state
-
-#Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
-  #gmean(CHL) < 3, "Oligotrophic", ifelse(
-   # gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
-      #gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
-
+#adding a column for watershed region
+ Lake_2 = Lake_2 %>% mutate(watershed_region = Lake_1$Nutrient_Watershed_Region[1])
 
 
 ```
@@ -100,11 +52,12 @@ gmean <- function(x){
 
 report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
 
-#Need to add "Watershed Region:" which is in Nutrient Watershed Region column in Basefile MS
+watershed_region = glue("{Lake_2$watershed_region[1]}", )
+
 ```
 
 ## `r report_title`
-## Watershed Region: 
+## Watershed Region: `r watershed_region`
 
 ### Introduction for River/Streams
 
@@ -284,7 +237,7 @@ knitr::include_graphics("~/Documents/GitHub/LWreports/Output/RiverStream/output_
 ```
 
 \newpage
-##Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.
+**Figure 2 and Figure 3. Trend plots of annual average total phosphorus and annual average total nitrogen versus year. The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots.**
 
 ```{r}
 

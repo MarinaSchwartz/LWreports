@@ -35,9 +35,10 @@ gmean <- function(x){
 ### Data Prep ----
 
 data_1 <- data_1 %>%
+  mutate(Station = as.character(Station)) %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Okaloosa") %>%
+  filter(County == "Volusia") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary"| `water type` == "Spring Boil"| `water type` == "Spring Run"| `water type` == "Dune Lake") 
 head(data_1)
 
@@ -55,14 +56,18 @@ head(data_all)
 
 #Run ONE of these two lines
 Lakes = unique(data_1$Lake_County)
-# Lakes = c("Miami Springs-1 Seminole",
+#Lakes = c("Gemini Springs Volusia")
 #           "Miami Springs-2 Seminole",
-#           "Miami Springs-3 Seminole")
-         #  "Grand Haven 18A Flagler",
-         #  "Grand Haven 28 Flagler",
-         #  "Grand Haven 4 Flagler",
-         #  "Grand Haven 5 Flagler",
-         # "Grand Haven W6 Flagler")
+#           "Miami Springs-3 Seminole",
+#  "St. John's River-1 Seminole",
+#  "St. John's River-2 Seminole",
+#  "St. John's River-3 Seminole",
+#  "Wekiva River Lower-1 Seminole",
+#  "Wekiva River Lower-2 Seminole",
+#  "Wekiva River Lower-3 Seminole",
+#  "Wekiva River-1 Seminole",
+#  "Wekiva River-2 Seminole",
+#  "Wekiva River-3 Seminole")
 
 print(Lakes)
 
@@ -81,18 +86,19 @@ for(l in Lakes){
   filter(Lake_County == l) 
   file_name = paste(Lake_2[1], ".pdf")
   
+  #adding a column using if/else for lake classification
+  ##this code currently has no fallback for if the data is missing.
+  Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
+    gmean(`Color`) > 40, "Colored", ifelse(
+      gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
   
-    #adding a column using if/else for lake classification
-    ##this code currently has no fallback for if the data is missing.
-    Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
-      gmean(`Color`) > 40, "Colored", ifelse(
-        gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
-    
-    #adding a column using if/else for trophic state
-    Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
-      gmean(CHL) < 3, "Oligotrophic", ifelse(
-        gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
-          gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+  #adding a column using if/else for trophic state
+  
+  Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
+    gmean(CHL) < 3, "Oligotrophic", ifelse(
+      gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
+        gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+  
   
     if(Lake_1$`water type`[1] == "Lake") {
       

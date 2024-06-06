@@ -33,80 +33,37 @@ options(gt.html_tag_check = FALSE)
 ```
 
 ```{r data_processing,  eval=TRUE}
-###IMPORTING LIBRARIES AND LOADING DATA###
-##########################################################################################
-#Commenting out this code to add to the for loop file
-#importing libraries 
-#library(tidyverse)
-#library(gt)
-#library(SciViews)
-#library(broom)
-#broom is just to get values form lm function in easier to reference from
-#library(glue)
-#library(ggtext)
-#glue and ggtext are for making labels. trying to make labels and get default ggplot functions to correctly parse those labels is a nightmare. ggtext helps by allowing you to use html tags in the labels. glue helps by allowing you to use variables in the labels.
-#library(readxl)
 
-### Loading and Preparing Data
 
-# path <- "C:/Users/amber.riner/Documents/LWreports"
-# setwd(path)
-# 
-# data_1 = read_xlsx("Lakewatch Base File 10-24-2023.xlsx")
-# data_1 <- data_1 %>%
-#   mutate(Lake_County = paste(Lake, County)) %>%
-#   filter(Study == "LW") %>%
-#   filter(`water type` == "Lake") 
-# head(data_1)
-# 
-# data_2 = read.csv("All_Data.csv")
-# data_2 = data_2 %>%
-#   mutate(Station = as.character(Station)) %>%
-#   mutate(Lake_County = paste(Lake, County)) 
-# head(data_2)
-# 
-# data_all <- data_1 %>% full_join(data_2, by = c("Lake_County", "Station"))
-# 
-# Lake = data_all %>% filter(Lake_County == "Alice Alachua") #subsetting data for lake alice
-
-##################################################################################
-
-###FUNCTIONS###
 
 #calculates geometric mean
 gmean <- function(x){
   xc <- x[!is.na(x)]
   xg <- exp(mean(log(xc[xc>0])))
-  #xg <- round(xg)
+  xg <- round(xg)
   return(xg)
 } 
 
-#adding a column using if/else for lake classification
-##this code currently has no fallback for if the data is missing.
-#Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
-  #gmean(`Color`) > 40, "Colored", ifelse(
-  #  gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
-
-#adding a column using if/else for trophic state
-
-#Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
-  #gmean(CHL) < 3, "Oligotrophic", ifelse(
-   # gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
-      #gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
-
+                                 
+#adding a column for Estuary
+ Lake_2 = Lake_2 %>% mutate(Estuary = Lake_1$Estuary)
+    
+#adding a column for Estuary Segment
+ Lake_2 = Lake_2 %>% mutate(Estuary_Segment = Lake_1$Estuary_Segment)
 
 
 ```
 
 ```{r title,  echo=FALSE}
 report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
+estuary = glue("{Lake_2$Estuary[1]}", )
+estuary_segment = glue("{Lake_2$Estuary_Segment[1]}", )
 
-#Need to add "Estuary and Estuary Segment:" which is in Basefile MS
 ```
 
 ## `r report_title`
 
-## Estuary and Estuary Segment:
+## Estuary and Estuary Segment:`r estuary` `r estuary_segment`
 
 ### Introduction for Estuaries
 
@@ -196,9 +153,6 @@ The following long-term data are the primary trophic state parameters collected 
 
 ```{r table_2_data}
 
-### From Lake RMD###
-
-
 #geometric means by year
 byyr <- Lake_2 %>%
   mutate(SECCHI_m = SECCHI_ft*.3) %>%
@@ -206,7 +160,12 @@ byyr <- Lake_2 %>%
   summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft), gmean(SECCHI_m), gmean(Color), gmean(Cond_uS))
 
 #minimum annual geometric means
-mins = c("Minimum Annual Geometric Mean", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), min(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), min(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), min(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), min(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), min(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]))
+mins = c("Minimum Annual Geometric Mean", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+min(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+min(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]),
+min(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), 
+min(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), 
+min(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]))
 
 
 #maximum annual geometric means
