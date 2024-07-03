@@ -36,9 +36,10 @@ gmean <- function(x){
 
 data_1 <- data_1 %>%
   mutate(Station = as.character(Station)) %>%
+  mutate(Narrative_Nutrient_Criteria_Waters = as.character(Narrative_Nutrient_Criteria_Waters)) %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Volusia") %>%
+  filter(County == "Marion") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary"| `water type` == "Spring Boil"| `water type` == "Spring Run"| `water type` == "Dune Lake") 
 head(data_1)
 
@@ -56,18 +57,8 @@ head(data_all)
 
 #Run ONE of these two lines
 Lakes = unique(data_1$Lake_County)
-#Lakes = c("Gemini Springs Volusia")
-#           "Miami Springs-2 Seminole",
-#           "Miami Springs-3 Seminole",
-#  "St. John's River-1 Seminole",
-#  "St. John's River-2 Seminole",
-#  "St. John's River-3 Seminole",
-#  "Wekiva River Lower-1 Seminole",
-#  "Wekiva River Lower-2 Seminole",
-#  "Wekiva River Lower-3 Seminole",
-#  "Wekiva River-1 Seminole",
-#  "Wekiva River-2 Seminole",
-#  "Wekiva River-3 Seminole")
+#Lakes = c("Bay Lake")
+#("Stewart Walton","Tresca Walton","Western Walton","Western Northeast Walton","Wilson Walton")
 
 print(Lakes)
 
@@ -83,6 +74,8 @@ for(l in Lakes){
   filter(Lake_County == l)
   
   Lake_2 <- data_2 %>%
+    mutate(Cond_mS = Cond_mS*1000)%>%
+    mutate(Cond = ifelse(is.na(Cond_uS), Cond_mS, Cond_uS))%>%
   filter(Lake_County == l) 
   file_name = paste(Lake_2[1], ".pdf")
   
@@ -90,7 +83,7 @@ for(l in Lakes){
   ##this code currently has no fallback for if the data is missing.
   Lake_2 = Lake_2 %>% mutate(lake_class = ifelse(
     gmean(`Color`) > 40, "Colored", ifelse(
-      gmean(`Color`) <= 40 & gmean(`Cond_uS`) <= 20, "Clear Soft Water","Clear Hard Water")))
+      gmean(`Color`) <= 40 & gmean(`Cond`) <= 20, "Clear Soft Water","Clear Hard Water")))
   
   #adding a column using if/else for trophic state
   

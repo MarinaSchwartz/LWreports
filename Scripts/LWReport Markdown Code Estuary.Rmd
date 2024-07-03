@@ -51,19 +51,20 @@ gmean <- function(x){
 #adding a column for Estuary Segment
  Lake_2 = Lake_2 %>% mutate(Estuary_Segment = Lake_1$Estuary_Segment)
 
-
+#adding a column for NNCwaters
+ Lake_2 = Lake_2 %>% mutate(Narrative_Nutrient_Criteria_Waters = Lake_1$Narrative_Nutrient_Criteria_Waters)
 ```
 
 ```{r title,  echo=FALSE}
 report_title = glue("Florida LAKEWATCH Report for  {Lake_2$Lake[1]} in {Lake_2$County[1]} 2024", )
-estuary = glue("{Lake_2$Estuary[1]}", )
-estuary_segment = glue("{Lake_2$Estuary_Segment[1]}", )
-
+estuary = glue("{ifelse(is.na(Lake_2$Estuary[1]), '', Lake_2$Estuary[1])}")
+estuary_segment = glue("{ifelse(is.na(Lake_2$Estuary_Segment[1]), '', Lake_2$Estuary_Segment[1])}")
+NNCwaters = glue("{ifelse(is.na(Lake_2$Narrative_Nutrient_Criteria_Waters[1]), '', Lake_2$Narrative_Nutrient_Criteria_Waters[1])}")
 ```
 
 ## `r report_title`
 
-## Estuary and Estuary Segment:`r estuary` `r estuary_segment`
+## Estuary and Estuary Segment: `r estuary` `r estuary_segment` `r NNCwaters`
 
 ### Introduction for Estuaries
 
@@ -153,29 +154,38 @@ The following long-term data are the primary trophic state parameters collected 
 
 ```{r table_2_data}
 
-#geometric means by year
+
 byyr <- Lake_2 %>%
-  mutate(SECCHI_m = SECCHI_ft*.3) %>%
+  mutate(SECCHI_m = SECCHI_ft*.3)%>%
   group_by(Year) %>%
-  summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft), gmean(SECCHI_m), gmean(Color), gmean(Cond_uS))
+  summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft), gmean(SECCHI_m), gmean(Color), gmean(Cond))
 
 #minimum annual geometric means
 mins = c("Minimum Annual Geometric Mean", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
 min(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
 min(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]),
-min(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), 
+min(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]), 
 min(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), 
-min(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]))
+min(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == TRUE]))
 
 
 #maximum annual geometric means
-maxs = c("Maximum Annual Geometric Mean", max(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), max(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), max(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), max(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), max(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), max(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), max(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]))
+maxs = c("Maximum Annual Geometric Mean", max(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), max(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+max(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+max(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), max(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]), 
+max(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), max(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == FALSE]))
 
 #grand geometric means
-ggmean = c("Grand Geometric Mean", gmean(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), gmean(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), gmean(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), gmean(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), gmean(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), gmean(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), gmean(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]))
+ggmean = c("Grand Geometric Mean", gmean(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), gmean(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+gmean(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+gmean(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), gmean(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]),
+gmean(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), gmean(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == FALSE]))
 
 #year counts
-n = c("n", length(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), length(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), length(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), length(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), length(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), length(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), length(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]))
+n = c("n", length(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), length(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+length(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+length(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), length(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]), 
+length(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), length(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == FALSE]))
 
 
 #add row names to array
@@ -221,7 +231,6 @@ tab_style(
 ) %>% tab_header(
   title = md("**Table 2.** Long-term trophic state data collected monthly by LAKEWATCH volunteers and color and specific conductance (collected quarterly)."))
 
-### End from lake RMD####
 
 
 
@@ -235,10 +244,7 @@ knitr::include_graphics("~/Documents/GitHub/LWreports/Output/Estuary/output_tabl
 
 \newpage
 
-##Figure 1 and Figure 2.
-Trend plots of annual average total phosphorus and annual average total nitrogen versus year.
-The R2 value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant).
-Trend Status are reported on plots.
+**Figure 1 and Figure 2. Trend plots of total phosphorus and total nitrogen versus year. The R^2^ value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots as Increasing, Decreasing, or No Trend.**
 
 ```{r}
 
@@ -479,7 +485,7 @@ knitr::include_graphics("~/Documents/GitHub/LWreports/Output/Estuary/output_grap
 
 \newpage
 
-**Figure 4 and Figure 5. Trend plots of total phosphorus and total nitrogen versus year. The R^2^ value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots as Increasing, Decreasing, or No Trend.**
+**Figure 3 and Figure 4. Trend plots of total phosphorus and total nitrogen versus year. The R^2^ value indicates the strength of the relations (ranges from 0.0 to 1.0; higher the R2 the stronger the relation) and the p value indicates if the relation is significant (p \< 0.05 is significant). Trend Status are reported on plots as Increasing, Decreasing, or No Trend.**
 
 ```{r chl_graph}
 #CHL Graph

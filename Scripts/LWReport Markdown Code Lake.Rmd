@@ -99,27 +99,39 @@ For the purpose of subparagraph 62-302.531(2)(b)1., F.A.C., color shall be asses
 byyr <- Lake_2 %>%
   mutate(SECCHI_m = SECCHI_ft*.3) %>%
   group_by(Year) %>%
-  summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft), gmean(SECCHI_m), gmean(Color), gmean(Cond_uS))
+  summarize(gmean(TP), gmean(TN), gmean(CHL), gmean(SECCHI_ft), gmean(SECCHI_m), gmean(Color), gmean(Cond))
 
 #minimum annual geometric means
-mins = c("Minimum Annual Geometric Mean", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), 
-min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+mins = c("Minimum Annual Geometric Mean", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
 min(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
-min(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), 
-min(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), 
+min(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]),
+min(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]), 
 min(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), 
-min(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]), 
+min(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == TRUE]),
 Lake_2$lake_class[1])
 
 
 #maximum annual geometric means
-maxs = c("Maximum Annual Geometric Mean", max(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), max(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), max(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), max(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), max(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), max(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), max(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]), " " )
+maxs = c("Maximum Annual Geometric Mean", max(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), max(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+max(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+max(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), max(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]), 
+max(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), 
+max(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == FALSE]),
+" ")
 
 #grand geometric means
-ggmean = c("Grand Geometric Mean", gmean(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), gmean(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), gmean(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), gmean(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), gmean(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), gmean(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), gmean(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]), " " )
+ggmean = c("Grand Geometric Mean", gmean(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), gmean(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+gmean(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+gmean(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), gmean(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]),
+gmean(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), gmean(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == FALSE]),
+" ")
 
 #year counts
-n = c("n", length(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), length(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), length(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), length(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), length(byyr$`gmean(SECCHI_ft)`[is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), length(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), length(byyr$`gmean(Cond_uS)`[is.na(byyr$`gmean(Cond_uS)`) == FALSE]), " " )
+n = c("n", length(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), length(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`) == FALSE]), 
+length(byyr$`gmean(CHL)`[ is.na(byyr$`gmean(CHL)`) == FALSE]), 
+length(byyr$`gmean(SECCHI_ft)`[ is.na(byyr$`gmean(SECCHI_ft)`) == FALSE]), length(byyr$`gmean(SECCHI_m)`[is.na(byyr$`gmean(SECCHI_m)`) == FALSE]), 
+length(byyr$`gmean(Color)`[ is.na(byyr$`gmean(Color)`) == FALSE]), length(byyr$`gmean(Cond)`[is.na(byyr$`gmean(Cond)`) == FALSE]),
+" ")
 
 
 #add row names to array
@@ -676,7 +688,6 @@ total_chl_graph = ggplot(data = Lake_2_bymo_CHL, aes(x = Year, y = gmean.CHL)) +
   
 
 
-
 ggsave("~/Documents/GitHub/LWreports/Output/Lake/output_graphs/total_chl_graph.png", width = 6, height = 4, units = "in", dpi = 300)
 }
 ```
@@ -728,10 +739,11 @@ total_secchi_graph = ggplot(data = Lake_2_bymo_SECCHI_ft, aes(x = Year, y = gmea
     se = TRUE, 
     color = "dodgerblue3",
     alpha=0.15,
-    linetype = paste(
-      if_else(total_secchi_table$p.value <= 0.05,true = "solid", false = "dashed" )
-      )
-    ) +
+    linetype = 
+    paste( if_else(total_secchi_table$p.value <= 0.05,true = "solid", false = "dashed" ) ) ) +
+  ###If stats are NaN then change line type to "dashed" and remove if else statement
+  ##"dashed")+
+  
   labs(title = plot_title, x = "Year", y = "Secchi depth (ft)",caption=label2)+
   scale_x_continuous(breaks = seq(min(Lake_2_bymo_SECCHI_ft$Year), 
     max(Lake_2_bymo_SECCHI_ft$Year), by = 2),
