@@ -307,7 +307,7 @@ sa <- paste(Lake_1$`SA (hectare)`[1], "ha, ", Lake_1$`SA (acres)`[1], "acres")
 rowval <- c(cnty, name, gnis, lat, long, wbt, sa, pr, lts, tpz, gtp, tnz, gtn )
 
 #add row names to array
-rowname <- c("County", "Name", "GNIS Number", "Latitude", "Longitude", "Water Body Type", "Surface Area (ha and acre)", "Period of Record (year)", "Lake Tophic Status (CHL)", "TP Zone", "Grand TP Geometric Mean Concentration (ug/ L, min, and max.)", "TN Zone", "Grand TN Geometric Mean Concentration (ug/ L, min, and max.)")
+rowname <- c("County", "Name", "GNIS Number", "Latitude", "Longitude", "Water Body Type", "Surface Area (ha and acre)", "Period of Record (year)", "Lake Trophic Status (CHL)", "TP Zone", "Grand TP Geometric Mean Concentration (ug/ L, min, and max.)", "TN Zone", "Grand TN Geometric Mean Concentration (ug/ L, min, and max.)")
 
 #make dataframe with rownames and row values
 tbl3df <- data.frame(rowname, rowval)
