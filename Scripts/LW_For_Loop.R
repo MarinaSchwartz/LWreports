@@ -90,7 +90,8 @@ for(l in Lakes){
   Lake_2 = Lake_2 %>% mutate(trophic_state = ifelse(
     gmean(CHL) < 3, "Oligotrophic", ifelse(
       gmean(CHL) >= 3 & gmean(CHL) < 7, "Mesotrophic", ifelse(
-        gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", "Hypereutrophic"))))
+        gmean(CHL) >= 7 & gmean(CHL) < 40, "Eutrophic", ifelse(
+          gmean(CHL) >= 40,"Hypereutrophic")))))
   
   
     if(Lake_1$`water type`[1] == "Lake") {
