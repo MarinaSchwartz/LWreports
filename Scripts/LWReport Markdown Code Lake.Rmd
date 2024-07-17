@@ -265,21 +265,13 @@ ggtn <- gmean(byyr$`gmean(TN)`)
 ggchl <- gmean(byyr$`gmean(CHL)`)
 ggsec <- (byyr$`gmean(SECCHI_ft)`)
 
-#calculate TSI
-tsi_sd <- 60 -14.41*ln(ggsec)
-tsi_chl <- 9.81* ln(ggchl) + 30.6
-tsi_tp <- 14.42* ln(ggtp) + 4.15
-tsi <- mean(tsi_sd, tsi_chl, tsi_tp)
 
 #define variables
 cnty <- Lake_2$County[1] #county
 name <- Lake_2$Lake[1] #name
 pr <- paste(min(Lake_2$Year), " to ", max(Lake_2$Year)) #period of record
-lts <- ifelse(tsi < 40 , "Oligotrophic", 
-              (ifelse(tsi < 50 , "Mesotrophic",
-               (ifelse(tsi < 70, "Eutrophic", "Hypereutrophic")))))  #lake trophic status
+lts <- Lake_2$trophic_state[1] #Trophic State
 tpz <- Lake_1$`TP Zone`[1] #tp zone
-
 gtp <- paste(ggtp, "(", min(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]), " to ", max(byyr$`gmean(TP)`[is.na(byyr$`gmean(TP)`)== FALSE]) , ")" ) #grand total phosphorous
 tnz <- Lake_1$`TN Zone`[1]
 gtn <- paste(ggtn, "(", min(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`)== FALSE]), " to ", max(byyr$`gmean(TN)`[is.na(byyr$`gmean(TN)`)== FALSE]) , ")" )  #grand tn geomean
@@ -288,19 +280,6 @@ lat <- round(Lake_1$Latitude[1], 4)
 long <- round(Lake_1$Longitude[1], 4)
 wbt <- Lake_1$`water type`[1]
 sa <- paste(Lake_1$`SA (hectare)`[1], "ha, ", Lake_1$`SA (acres)`[1], "acres")
-
-
-### IF Statements (Before I had access to the base file).  Will possible use later
-# tpz <- ifelse(ggtp >= 355, "TP6", 
-#               (ifelse(ggtp >= 252, "TP5",
-#                (ifelse(ggtp >= 93, "TP4",
-#                 (ifelse(ggtp >= 45, "TP3",
-#                  (ifelse(ggtp >= 21, "TP2","TP1"))))))))) #tp zone
-# tnz <- ifelse(ggtn >= 2701, "TN6", 
-#               (ifelse(ggtn >= 1369, "TN5",
-#                (ifelse(ggtn >= 1087, "TN4",
-#                 (ifelse(ggtn >= 642, "TN3",
-#                  (ifelse(ggtn >= 450, "TN2","TN1"))))))))) #tn zone
 
 
 #add values to array

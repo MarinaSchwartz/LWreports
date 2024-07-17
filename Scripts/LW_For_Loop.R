@@ -39,7 +39,7 @@ data_1 <- data_1 %>%
   mutate(Narrative_Nutrient_Criteria_Waters = as.character(Narrative_Nutrient_Criteria_Waters)) %>%
   mutate(Lake_County = paste(Lake, County)) %>%
   filter(Study == "LW") %>%
-  filter(County == "Marion") %>%
+  filter(County == "Orange") %>%
   filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary"| `water type` == "Spring Boil"| `water type` == "Spring Run"| `water type` == "Dune Lake") 
 head(data_1)
 
@@ -56,8 +56,8 @@ head(data_all)
 ### for loop with counter ----
 
 #Run ONE of these two lines
-Lakes = unique(data_1$Lake_County)
-#Lakes = c("Bay Lake")
+#Lakes = unique(data_1$Lake_County)
+Lakes = c("Adair Orange")
 #("Stewart Walton","Tresca Walton","Western Walton","Western Northeast Walton","Wilson Walton")
 
 print(Lakes)
