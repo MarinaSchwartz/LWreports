@@ -46,7 +46,7 @@
     mutate(Narrative_Nutrient_Criteria_Waters = as.character(Narrative_Nutrient_Criteria_Waters)) %>%
     mutate(Lake_County = paste(Lake, County)) %>%
     filter(Study == "LW") %>%
-    filter(County == "Lake") %>%
+    filter(County == "Highlands") %>%
     filter(`water type` == "Lake" | `water type` == "River/Stream" | `water type` == "Estuary"| `water type` == "Spring Boil"| `water type` == "Spring Run"| `water type` == "Dune Lake") 
   head(data_1)
   
@@ -64,7 +64,7 @@
   
   #Run ONE of these two lines
  #Lakes = unique(data_1$Lake_County)
-  Lakes = c("Grasshopper Lake")
+  Lakes = c("Dinner Highlands")
   #,"WF-2 Charlotte","WF-3 Charlotte","WF-4 Charlotte","WF-5 Charlotte","WF-6 Charlotte",
   #"LC-1 Charlotte","LC-2 Charlotte","LC-3 Charlotte")
             #  "Twin Seminole", "Twin East Seminole", "Wekiva Seminole", "Wekiva River Lower-2 Seminole",
